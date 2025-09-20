@@ -15,7 +15,6 @@ class DonationApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Paleta que me diste
     const primary = Color(0xFF003137);
     const secondary = Color(0xFF6F9AA0);
     const background = Color(0xFFAFC7CA);
