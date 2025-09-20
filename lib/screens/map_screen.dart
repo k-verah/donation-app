@@ -11,7 +11,6 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   GoogleMapController? _controller;
 
-  // Centro del mapa (Bogotá)
   static const _initial = LatLng(4.7110, -74.0721);
 
   // Filtros
