@@ -155,7 +155,7 @@ class _Drop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      isExpanded: true, // 👈 esto asegura que use todo el ancho
+      isExpanded: true, 
       value: value,
       decoration: InputDecoration(
         labelText: label,
