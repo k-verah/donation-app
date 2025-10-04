@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'map_screen.dart';
 import 'dashboard_screen.dart';
+import 'schedule_screen.dart';
+import 'pickup_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -14,16 +16,26 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   bool _showHub = true;
-  int _index = 0;
 
-  final _pageController = PageController(viewportFraction: 0.9);
+  int _navIndex = 2;
+
+  int _screenIndex = 0;
+
+  final _pageController = PageController(viewportFraction: 0.92);
   int _bannerIndex = 0;
   Timer? _autoTimer;
 
   final _banners = const [
-    _BannerCard(texto: 'Dale nueva vida a tu ropa ♻️'),
+    _BannerCard(texto: 'Dale nueva vida a tu ropa'),
     _BannerCard(texto: 'Agenda una recolección a domicilio'),
     _BannerCard(texto: 'Tu impacto ayuda a más familias'),
+  ];
+
+  final _screens = const [
+    MapScreen(),
+    ScheduleScreen(),
+    DashboardScreen(),
+    PickupScreen(),
   ];
 
   @override
@@ -34,7 +46,7 @@ class _MainShellState extends State<MainShell> {
       _bannerIndex = (_bannerIndex + 1) % _banners.length;
       _pageController.animateToPage(
         _bannerIndex,
-        duration: const Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 420),
         curve: Curves.easeOut,
       );
       setState(() {});
@@ -48,36 +60,34 @@ class _MainShellState extends State<MainShell> {
     super.dispose();
   }
 
-  void _goHub() {
-    setState(() => _showHub = true);
-  }
+  void _goHub() => setState(() {
+        _showHub = true;
+        _navIndex = 2;
+      });
 
   void _onNavTap(int i) {
-    setState(() {
-      _index = i;
-      if (i == 0) {
-        _showHub = false;
-      } else if (i == 2) {
-        _showHub = false;
-      } else {
+    if (i == 2) {
+      setState(() {
         _showHub = true;
-      }
+        _navIndex = 2;
+      });
+      return;
+    }
+    setState(() {
+      _showHub = false;
+      _navIndex = i;
+      _screenIndex = (i < 2) ? i : i - 1;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final Widget body;
-    if (_showHub) {
-      body = _buildHub(context);
-    } else {
-      body = (_index == 2) ? const DashboardScreen() : const MapScreen();
-    }
+    final Widget body = _showHub ? _buildHub(context) : _screens[_screenIndex];
 
     return Scaffold(
       body: body,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
+        selectedIndex: _navIndex,
         onDestinationSelected: _onNavTap,
         destinations: const [
           NavigationDestination(
@@ -91,6 +101,11 @@ class _MainShellState extends State<MainShell> {
             label: 'Agendar',
           ),
           NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Inicio',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.insights_outlined),
             selectedIcon: Icon(Icons.insights),
             label: 'Impacto',
@@ -98,7 +113,7 @@ class _MainShellState extends State<MainShell> {
           NavigationDestination(
             icon: Icon(Icons.local_shipping_outlined),
             selectedIcon: Icon(Icons.local_shipping),
-            label: 'Home PickUp',
+            label: 'PickUp',
           ),
         ],
       ),
@@ -106,18 +121,20 @@ class _MainShellState extends State<MainShell> {
   }
 
   Widget _buildHub(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+
     return SafeArea(
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
             child: Row(
               children: [
                 InkWell(
                   onTap: _goHub,
                   borderRadius: BorderRadius.circular(8),
                   child: Text(
-                    'recyclothes',
+                    'Recyclothes',
                     style: GoogleFonts.montserrat(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -134,31 +151,38 @@ class _MainShellState extends State<MainShell> {
               ],
             ),
           ),
-
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
             child: SizedBox(
               width: double.infinity,
+              height: 60,
               child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  textStyle: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  shape: const StadiumBorder(),
+                ),
                 onPressed: () {},
                 icon: const Icon(Icons.add),
                 label: const Text('Nueva Donación'),
               ),
             ),
           ),
-          const SizedBox(height: 12),
-
-          SizedBox(
-            height: 160,
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: _banners.length,
-              onPageChanged: (i) => setState(() => _bannerIndex = i),
-              itemBuilder: (_, i) => _banners[i],
+          Expanded(
+            child: Center(
+              child: SizedBox(
+                height: 320,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: _banners.length,
+                  onPageChanged: (i) => setState(() => _bannerIndex = i),
+                  itemBuilder: (_, i) => _banners[i],
+                ),
+              ),
             ),
           ),
-
-          // indicadores
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -170,24 +194,13 @@ class _MainShellState extends State<MainShell> {
                 width: active ? 20 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: active
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                  color: active ? primary : primary.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
               );
             }),
           ),
-
-          const SizedBox(height: 16),
-          Expanded(
-            child: Center(
-              child: Text(
-                'Bienvenida a Recyclothes 👋',
-                style: GoogleFonts.montserrat(fontSize: 16),
-              ),
-            ),
-          ),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -201,19 +214,19 @@ class _BannerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.12),
-                Theme.of(context).colorScheme.secondary.withOpacity(0.12),
+                Theme.of(context).colorScheme.primary.withOpacity(0.10),
+                Theme.of(context).colorScheme.secondary.withOpacity(0.10),
               ],
             ),
           ),
@@ -222,7 +235,7 @@ class _BannerCard extends StatelessWidget {
               texto,
               textAlign: TextAlign.center,
               style: GoogleFonts.montserrat(
-                fontSize: 16,
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
             ),
