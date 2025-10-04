@@ -389,14 +389,14 @@ class _HubAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     return AppBar(
-      backgroundColor: primary, // ← color sólido arriba
+      automaticallyImplyLeading: false,
+      backgroundColor: primary,
       foregroundColor: Colors.white,
       elevation: 0,
-      systemOverlayStyle:
-          SystemUiOverlayStyle.light, // íconos de status bar claros
+      systemOverlayStyle: SystemUiOverlayStyle.light,
       titleSpacing: 16,
       title: Text(
-        'recyclothes',
+        'Recyclothes',
         style: GoogleFonts.montserrat(
           fontSize: 22,
           fontWeight: FontWeight.w800,
