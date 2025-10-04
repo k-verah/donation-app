@@ -6,6 +6,8 @@ import 'screens/map_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/tagging_screen.dart';
+import 'screens/schedule_screen.dart';
+import 'screens/pickup_screen.dart';
 
 void main() {
   runApp(const DonationApp());
@@ -81,6 +83,8 @@ class _HomeShellState extends State<_HomeShell> {
     DashboardScreen(),
     NotificationsScreen(),
     TaggingScreen(),
+    ScheduleScreen(), 
+    PickupScreen(),
   ];
 
   @override
@@ -107,6 +111,16 @@ class _HomeShellState extends State<_HomeShell> {
               icon: Icon(Icons.label_outline),
               selectedIcon: Icon(Icons.label),
               label: 'Etiquetar'),
+          NavigationDestination(
+              icon: Icon(Icons.calendar_today_outlined),
+              selectedIcon: Icon(Icons.calendar_today),
+              label: 'Agendar'),
+
+          NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'PickUp',
+            ),
         ],
       ),
     );
