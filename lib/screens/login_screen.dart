@@ -47,13 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loading = false);
   }
 
-  void _register() {
-    // Registro simulado
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Registro simulado exitoso')),
-    );
-  }
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -77,9 +70,9 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text("Iniciar Sesión",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 30),
-
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -89,7 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 15),
-
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -99,29 +91,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 25),
-
                 ElevatedButton(
                   onPressed: _loading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 15),
                   ),
                   child: _loading
                       ? const SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
                         )
                       : const Text("Entrar"),
                 ),
-
                 const SizedBox(height: 10),
-
                 TextButton(
-                  onPressed: _register,
-                  child: const Text("Registrarse"),
-                )
+                    onPressed: () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.pushReplacementNamed(context, '/start');
+                      }
+                    },
+                    child: const Text("Volver"))
               ],
             ),
           ),
@@ -130,4 +126,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

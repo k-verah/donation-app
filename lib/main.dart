@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/initial_page_screen.dart';
+import 'screens/new_donation_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/notifications_screen.dart';
@@ -22,7 +25,7 @@ class DonationApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Donation App',
+      title: 'Recyclothes',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme(
@@ -54,60 +57,59 @@ class DonationApp extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
         ),
       ),
-
-      // 🔑 Empezamos en Login
-      initialRoute: '/login',
-
+      home: const _StartScreen(),
       routes: {
+        '/start': (context) => const _StartScreen(),
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const _HomeShell(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (_) => const MainShell(),
+        '/notifications': (_) => const NotificationsScreen()
       },
     );
   }
 }
 
-class _HomeShell extends StatefulWidget {
-  const _HomeShell({super.key});
-
-  @override
-  State<_HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<_HomeShell> {
-  int _index = 0;
-
-  final List<Widget> _screens = const [
-    MapScreen(),
-    DashboardScreen(),
-    NotificationsScreen(),
-    TaggingScreen(),
-  ];
+class _StartScreen extends StatelessWidget {
+  const _StartScreen();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _index, children: _screens),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(
-              icon: Icon(Icons.map_outlined),
-              selectedIcon: Icon(Icons.map),
-              label: 'Mapa'),
-          NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard),
-              label: 'Dashboard'),
-          NavigationDestination(
-              icon: Icon(Icons.notifications_none),
-              selectedIcon: Icon(Icons.notifications),
-              label: 'Notificaciones'),
-          NavigationDestination(
-              icon: Icon(Icons.label_outline),
-              selectedIcon: Icon(Icons.label),
-              label: 'Etiquetar'),
-        ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 24),
+                const Text('Te damos la bienvenida',
+                    style:
+                        TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                const Text('Elige una opción para empezar',
+                    textAlign: TextAlign.center),
+                const SizedBox(height: 28),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.pushNamed(context, '/login'),
+                    child: const Text('Iniciar sesión'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pushNamed(context, '/register'),
+                    child: const Text('Crear cuenta'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
