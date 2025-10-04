@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -25,8 +26,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
     if (picked != null) {
       setState(() {
-        _dateController.text =
-            "${picked.day}/${picked.month}/${picked.year}";
+        _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
   }
@@ -125,7 +125,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   textStyle: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                child: const Text("Confirm Schedule"),
+                child: Text("Confirm Schedule",
+                    style: GoogleFonts.montserrat(fontWeight: FontWeight.w600)),
               ),
             ],
           ),
