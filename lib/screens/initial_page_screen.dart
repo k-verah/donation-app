@@ -159,31 +159,72 @@ class _MainShellState extends State<MainShell> {
 
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-            child: SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  textStyle: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  shape: const StadiumBorder(),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                    maxWidth:
+                        520), // opcional, para que no sean gigantes en pantallas anchas
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Nueva Donación
+                    SizedBox(
+                      height: 60,
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          textStyle: GoogleFonts.montserrat(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          shape: const StadiumBorder(),
+                        ),
+                        onPressed: () async {
+                          final res = await Navigator.pushNamed(
+                              context, '/new-donation');
+                          if (!mounted) return;
+                          if (res is DonationItem) {
+                            setState(() {
+                              _lastDonation = res;
+                              _showHub = true;
+                              _navIndex = 2;
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Nueva Donación'),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Ubicar fundaciones más cercanas
+                    SizedBox(
+                      height: 56,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.primary),
+                          foregroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          textStyle: GoogleFonts.montserrat(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        onPressed: () {
+                          _onNavTap(0); // ir a la pestaña Mapa
+                        },
+                        icon: const Icon(Icons.my_location),
+                        label: const Text(
+                          'Ubicar fundaciones más cercanas',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                onPressed: () async {
-                  final res =
-                      await Navigator.pushNamed(context, '/new-donation');
-                  if (!mounted) return;
-                  if (res is DonationItem) {
-                    setState(() {
-                      _lastDonation = res;
-                      _showHub = true;
-                      _navIndex = 2;
-                    });
-                  }
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Nueva Donación'),
               ),
             ),
           ),
@@ -228,7 +269,7 @@ class _MainShellState extends State<MainShell> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Donaciones recientes',
+                  'Mis Donaciones',
                   style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
