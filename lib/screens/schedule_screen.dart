@@ -45,7 +45,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Schedule Your Donation")),
+      appBar: AppBar(
+        title: const Text('Schedule your Donation'),
+        leading: BackButton(
+          onPressed: () {
+            final nav = Navigator.of(context);
+            if (nav.canPop()) {
+              nav.pop();
+            } else {
+              nav.pushNamedAndRemoveUntil('/home', (route) => false);
+            }
+          },
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(

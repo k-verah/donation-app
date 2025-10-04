@@ -91,8 +91,17 @@ class _PickupScreenState extends State<PickupScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PickUp At Home"),
-        backgroundColor: primary,
+        title: const Text('PickUp at Home'),
+        leading: BackButton(
+          onPressed: () {
+            final nav = Navigator.of(context);
+            if (nav.canPop()) {
+              nav.pop();
+            } else {
+              nav.pushNamedAndRemoveUntil('/home', (route) => false);
+            }
+          },
+        ),
       ),
       backgroundColor: background,
       body: Padding(

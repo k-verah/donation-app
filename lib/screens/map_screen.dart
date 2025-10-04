@@ -57,7 +57,19 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Mapa de donación")),
+      appBar: AppBar(
+        title: const Text('Mapa de Donación'),
+        leading: BackButton(
+          onPressed: () {
+            final nav = Navigator.of(context);
+            if (nav.canPop()) {
+              nav.pop();
+            } else {
+              nav.pushNamedAndRemoveUntil('/home', (route) => false);
+            }
+          },
+        ),
+      ),
       body: Column(
         children: [
           // 🔹 Barra de filtros en una sola fila compacta
@@ -69,15 +81,18 @@ class _MapScreenState extends State<MapScreen> {
                   child: DropdownButtonFormField<String>(
                     value: _selectedCause,
                     items: ["Todos", "Ropa", "Alimentos", "Libros"]
-                        .map((cause) =>
-                            DropdownMenuItem(value: cause, child: Text(cause, style: const TextStyle(fontSize: 12))))
+                        .map((cause) => DropdownMenuItem(
+                            value: cause,
+                            child: Text(cause,
+                                style: const TextStyle(fontSize: 12))))
                         .toList(),
                     onChanged: (value) =>
                         setState(() => _selectedCause = value!),
                     decoration: const InputDecoration(
                       labelText: "Causa",
                       labelStyle: TextStyle(fontSize: 12),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -87,15 +102,18 @@ class _MapScreenState extends State<MapScreen> {
                   child: DropdownButtonFormField<String>(
                     value: _selectedAccess,
                     items: ["Todos", "Fácil", "Medio", "Difícil"]
-                        .map((access) =>
-                            DropdownMenuItem(value: access, child: Text(access, style: const TextStyle(fontSize: 12))))
+                        .map((access) => DropdownMenuItem(
+                            value: access,
+                            child: Text(access,
+                                style: const TextStyle(fontSize: 12))))
                         .toList(),
                     onChanged: (value) =>
                         setState(() => _selectedAccess = value!),
                     decoration: const InputDecoration(
                       labelText: "Acceso",
                       labelStyle: TextStyle(fontSize: 12),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -105,15 +123,18 @@ class _MapScreenState extends State<MapScreen> {
                   child: DropdownButtonFormField<String>(
                     value: _selectedSchedule,
                     items: ["Todos", "Mañana", "Tarde", "Noche"]
-                        .map((schedule) =>
-                            DropdownMenuItem(value: schedule, child: Text(schedule, style: const TextStyle(fontSize: 12))))
+                        .map((schedule) => DropdownMenuItem(
+                            value: schedule,
+                            child: Text(schedule,
+                                style: const TextStyle(fontSize: 12))))
                         .toList(),
                     onChanged: (value) =>
                         setState(() => _selectedSchedule = value!),
                     decoration: const InputDecoration(
                       labelText: "Horario",
                       labelStyle: TextStyle(fontSize: 12),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       border: OutlineInputBorder(),
                     ),
                   ),

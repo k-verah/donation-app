@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 import '../models/donation_item.dart';
 import 'map_screen.dart';
@@ -90,6 +91,11 @@ class _MainShellState extends State<MainShell> {
     final Widget body = _showHub ? _buildHub(context) : _screens[_screenIndex];
 
     return Scaffold(
+      appBar: _showHub
+          ? _HubAppBar(onBell: () {
+              Navigator.pushNamed(context, '/notifications');
+            })
+          : null,
       body: body,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _navIndex,
@@ -134,26 +140,7 @@ class _MainShellState extends State<MainShell> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
             child: Row(
-              children: [
-                InkWell(
-                  onTap: _goHub,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Text(
-                    'Recyclothes',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  tooltip: 'Campañas y avisos',
-                  onPressed: () =>
-                      Navigator.pushNamed(context, '/notifications'),
-                  icon: const Icon(Icons.notifications_none),
-                ),
-              ],
+              children: [/* Recyclothes + campanita */],
             ),
           ),
 
@@ -161,9 +148,7 @@ class _MainShellState extends State<MainShell> {
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                    maxWidth:
-                        520), // opcional, para que no sean gigantes en pantallas anchas
+                constraints: const BoxConstraints(maxWidth: 520),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -389,6 +374,43 @@ class _LastDonationCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _HubAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final VoidCallback onBell;
+  const _HubAppBar({required this.onBell});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(56);
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    return AppBar(
+      backgroundColor: primary, // ← color sólido arriba
+      foregroundColor: Colors.white,
+      elevation: 0,
+      systemOverlayStyle:
+          SystemUiOverlayStyle.light, // íconos de status bar claros
+      titleSpacing: 16,
+      title: Text(
+        'recyclothes',
+        style: GoogleFonts.montserrat(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: Colors.white,
+        ),
+      ),
+      actions: [
+        IconButton(
+          tooltip: 'Campañas y avisos',
+          onPressed: onBell,
+          icon: const Icon(Icons.notifications_none),
+        ),
+        const SizedBox(width: 4),
+      ],
     );
   }
 }
