@@ -5,12 +5,7 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/initial_page_screen.dart';
 import 'screens/new_donation_screen.dart';
-import 'screens/map_screen.dart';
-import 'screens/dashboard_screen.dart';
 import 'screens/notifications_screen.dart';
-import 'screens/tagging_screen.dart';
-import 'screens/schedule_screen.dart';
-import 'screens/pickup_screen.dart';
 
 void main() {
   runApp(const DonationApp());
@@ -65,7 +60,8 @@ class DonationApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (_) => const MainShell(),
-        '/notifications': (_) => const NotificationsScreen()
+        '/notifications': (_) => const NotificationsScreen(),
+        '/new-donation': (_) => const NewDonationScreen(),
       },
     );
   }

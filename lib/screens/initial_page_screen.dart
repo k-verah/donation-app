@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../models/donation_item.dart';
 import 'map_screen.dart';
 import 'dashboard_screen.dart';
 import 'schedule_screen.dart';
@@ -21,6 +23,9 @@ class _MainShellState extends State<MainShell> {
 
   int _screenIndex = 0;
 
+  DonationItem? _lastDonation;
+
+  // Carrusel
   final _pageController = PageController(viewportFraction: 0.92);
   int _bannerIndex = 0;
   Timer? _autoTimer;
@@ -151,6 +156,7 @@ class _MainShellState extends State<MainShell> {
               ],
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
             child: SizedBox(
@@ -164,12 +170,24 @@ class _MainShellState extends State<MainShell> {
                   ),
                   shape: const StadiumBorder(),
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  final res =
+                      await Navigator.pushNamed(context, '/new-donation');
+                  if (!mounted) return;
+                  if (res is DonationItem) {
+                    setState(() {
+                      _lastDonation = res;
+                      _showHub = true;
+                      _navIndex = 2;
+                    });
+                  }
+                },
                 icon: const Icon(Icons.add),
                 label: const Text('Nueva Donación'),
               ),
             ),
           ),
+
           Expanded(
             child: Center(
               child: SizedBox(
@@ -183,6 +201,8 @@ class _MainShellState extends State<MainShell> {
               ),
             ),
           ),
+
+          // Indicadores
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -200,6 +220,29 @@ class _MainShellState extends State<MainShell> {
               );
             }),
           ),
+
+          if (_lastDonation != null) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Donaciones recientes',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _LastDonationCard(item: _lastDonation!),
+            ),
+          ],
+
           const SizedBox(height: 12),
         ],
       ),
@@ -240,6 +283,69 @@ class _BannerCard extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LastDonationCard extends StatelessWidget {
+  final DonationItem item;
+  const _LastDonationCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            // Miniatura
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                File(item.imagePath),
+                width: 84,
+                height: 84,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Texto
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${item.type} · ${item.brand}',
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  if (item.tags.isNotEmpty)
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: -6,
+                      children: item.tags.take(3).map((t) {
+                        return Chip(
+                          label: Text(t),
+                          visualDensity: VisualDensity.compact,
+                        );
+                      }).toList(),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
