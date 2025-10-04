@@ -9,6 +9,8 @@ import 'screens/map_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/tagging_screen.dart';
+import 'screens/schedule_screen.dart';
+import 'screens/pickup_screen.dart';
 
 void main() {
   runApp(const DonationApp());
