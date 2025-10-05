@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -30,8 +31,10 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Resumen de donaciones",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              "Resumen de donaciones",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             Row(
               children: const [
@@ -48,8 +51,10 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            const Text("Meta anual",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              "Meta anual",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
               value: goalProgress,
@@ -61,8 +66,82 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: 6),
             const Text("Has cumplido el 60% de tu meta 🎉"),
             const SizedBox(height: 24),
-            const Text("Últimas acciones",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+            // --- Business Question ---
+            const Text(
+              "Análisis: ¿En qué horarios se realizan más donaciones?",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            AspectRatio(
+              aspectRatio: 1.6,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: 10,
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          const labels = ['Mañana', 'Tarde', 'Noche'];
+                          if (value.toInt() < labels.length) {
+                            return Text(labels[value.toInt()]);
+                          }
+                          return const SizedBox();
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: true, reservedSize: 28),
+                    ),
+                  ),
+                  barGroups: [
+                    BarChartGroupData(
+                      x: 0,
+                      barRods: [
+                        BarChartRodData(
+                          toY: 5,
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 20,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 1,
+                      barRods: [
+                        BarChartRodData(
+                          toY: 8,
+                          color: Theme.of(context).colorScheme.secondary,
+                          width: 20,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 2,
+                      barRods: [
+                        BarChartRodData(
+                          toY: 3,
+                          color: Colors.teal[200],
+                          width: 20,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            const Text(
+              "Últimas acciones",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             ...const [
               _ActionTile(
@@ -87,8 +166,11 @@ class _ImpactCard extends StatelessWidget {
   final String value;
   final String label;
 
-  const _ImpactCard(
-      {required this.icon, required this.value, required this.label});
+  const _ImpactCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -102,9 +184,11 @@ class _ImpactCard extends StatelessWidget {
               Icon(icon,
                   size: 28, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 8),
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                value,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 4),
               Text(label, style: const TextStyle(fontSize: 12)),
             ],
