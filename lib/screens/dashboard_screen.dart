@@ -15,14 +15,11 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi Impacto'),
-        leading: BackButton(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            final nav = Navigator.of(context);
-            if (nav.canPop()) {
-              nav.pop();
-            } else {
-              nav.pushNamedAndRemoveUntil('/home', (route) => false);
-            }
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/home', (route) => false);
           },
         ),
       ),
@@ -95,7 +92,8 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                     leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: true, reservedSize: 28),
+                      sideTitles:
+                          SideTitles(showTitles: true, reservedSize: 28),
                     ),
                   ),
                   barGroups: [

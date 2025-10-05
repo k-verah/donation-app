@@ -47,14 +47,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Schedule your Donation'),
-        leading: BackButton(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            final nav = Navigator.of(context);
-            if (nav.canPop()) {
-              nav.pop();
-            } else {
-              nav.pushNamedAndRemoveUntil('/home', (route) => false);
-            }
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/home', (route) => false);
           },
         ),
       ),
