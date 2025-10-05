@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "802764704131",
+    "firebase_url": "https://recyclothes-71fdd-default-rtdb.firebaseio.com",
+    "project_id": "recyclothes-71fdd",
+    "storage_bucket": "recyclothes-71fdd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802764704131:android:f3477f7578f71dd5ce8eb6",
+        "android_client_info": {
+          "package_name": "com.example.donation_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1hIV-6WpSehnSJTnxnnKJz3WcFqPMFAk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802764704131:android:b421c735d1e6b17cce8eb6",
+        "android_client_info": {
+          "package_name": "com.example.vistaquickdonation"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1hIV-6WpSehnSJTnxnnKJz3WcFqPMFAk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
