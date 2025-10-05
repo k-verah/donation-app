@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,39 +13,66 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
 
-  final Map<String, String> _fakeUsers = {
-    'test@test.com': '123456',
-    'juli@tatis.com': 'pass123',
-  };
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/home');
+      });
+    }
+  }
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
     final pw = _passwordController.text.trim();
 
     if (email.isEmpty || pw.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa correo y contraseña')),
-      );
+      _toast('Por favor ingresa correo y contraseña');
       return;
     }
 
     setState(() => _loading = true);
-
-    // Simulación de retraso de red
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    final expected = _fakeUsers[email];
-    if (expected != null && expected == pw) {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: pw,
+      );
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Credenciales incorrectas')),
-      );
+    } on FirebaseAuthException catch (e) {
+      final msg = _mapAuthError(e);
+      _toast(msg);
+    } catch (e) {
+      _toast('Ocurrió un error inesperado. Intenta de nuevo.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
+  }
 
-    setState(() => _loading = false);
+  String _mapAuthError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-email':
+        return 'Correo inválido.';
+      case 'user-not-found':
+        return 'Usuario no encontrado.';
+      case 'wrong-password':
+        return 'Contraseña incorrecta.';
+      case 'user-disabled':
+        return 'Usuario deshabilitado.';
+      case 'too-many-requests':
+        return 'Demasiados intentos. Intenta más tarde.';
+      case 'network-request-failed':
+        return 'Sin conexión. Revisa tu internet.';
+      default:
+        return e.message ?? 'Error de autenticación.';
+    }
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -69,13 +97,15 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Iniciar Sesión",
-                    style:
-                        TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                const Text(
+                  "Iniciar Sesión",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 30),
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: "Correo electrónico",
                     border: OutlineInputBorder(),
@@ -85,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
+                  onSubmitted: (_) => _loading ? null : _login(),
                   decoration: const InputDecoration(
                     labelText: "Contraseña",
                     border: OutlineInputBorder(),
@@ -104,20 +135,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : const Text("Entrar"),
                 ),
                 const SizedBox(height: 10),
                 TextButton(
-                    onPressed: () {
-                      if (Navigator.canPop(context)) {
-                        Navigator.pop(context);
-                      } else {
-                        Navigator.pushReplacementNamed(context, '/start');
-                      }
-                    },
-                    child: const Text("Volver"))
+                  onPressed: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    } else {
+                      Navigator.pushReplacementNamed(context, '/start');
+                    }
+                  },
+                  child: const Text("Volver"),
+                ),
               ],
             ),
           ),
