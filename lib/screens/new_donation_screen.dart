@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'camera_sensor_screen.dart';
 import '../models/donation_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class NewDonationScreen extends StatefulWidget {
   const NewDonationScreen({super.key});
@@ -68,9 +70,8 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
     if (img != null) setState(() => _image = img);
   }
 
-  void _submit() {
-    if (_image == null ||
-        _desc.text.trim().isEmpty ||
+  void _submit() async {
+    if (_desc.text.trim().isEmpty ||
         _type == null ||
         _size.text.trim().isEmpty ||
         _brand.text.trim().isEmpty) {
@@ -84,8 +85,22 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
       return;
     }
 
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    final data = {
+      'uid': uid,
+      'description': _desc.text.trim(),
+      'type': _type!.trim(),
+      'size': _size.text.trim(),
+      'brand': _brand.text.trim(),
+      'tags': _selectedTags.toList(),
+      'createdAt': FieldValue.serverTimestamp(), // hora de servidor
+    };
+
+    await FirebaseFirestore.instance.collection('donations').add(data);
+
     final item = DonationItem(
-      imagePath: _image!.path,
+      imagePath: _image?.path,
       description: _desc.text.trim(),
       type: _type!,
       size: _size.text.trim(),

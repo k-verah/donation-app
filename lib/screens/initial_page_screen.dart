@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/donation_item.dart';
 import 'map_screen.dart';
@@ -25,6 +27,8 @@ class _MainShellState extends State<MainShell> {
   int _screenIndex = 0;
 
   DonationItem? _lastDonation;
+
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _donationSub;
 
   // Carrusel
   final _pageController = PageController(viewportFraction: 0.92);
@@ -57,10 +61,40 @@ class _MainShellState extends State<MainShell> {
       );
       setState(() {});
     });
+    _listenLastDonation();
+  }
+
+  void _listenLastDonation() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    _donationSub = FirebaseFirestore.instance
+        .collection('donations')
+        .where('uid', isEqualTo: uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .listen((snap) {
+      if (!mounted || snap.docs.isEmpty) return;
+      final data = snap.docs.first.data();
+      final fromDb = DonationItem.fromMap(data);
+
+      setState(() {
+        _lastDonation = DonationItem(
+          imagePath: _lastDonation?.imagePath,
+          description: fromDb.description,
+          type: fromDb.type,
+          size: fromDb.size,
+          brand: fromDb.brand,
+          tags: fromDb.tags,
+          createdAt: fromDb.createdAt,
+        );
+      });
+    });
   }
 
   @override
   void dispose() {
+    _donationSub?.cancel();
     _autoTimer?.cancel();
     _pageController.dispose();
     super.dispose();
@@ -140,7 +174,7 @@ class _MainShellState extends State<MainShell> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
             child: Row(
-              children: [/* Recyclothes + campanita */],
+              children: [],
             ),
           ),
 
@@ -330,13 +364,20 @@ class _LastDonationCard extends StatelessWidget {
         child: Row(
           children: [
             // Miniatura
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.file(
-                File(item.imagePath),
-                width: 84,
-                height: 84,
-                fit: BoxFit.cover,
+            SizedBox(
+              width: 64,
+              height: 64,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: (item.imagePath != null && item.imagePath!.isNotEmpty)
+                    ? Image.file(
+                        File(item.imagePath!),
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        child: const Icon(Icons.image_not_supported),
+                      ),
               ),
             ),
             const SizedBox(width: 12),
