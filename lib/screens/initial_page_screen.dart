@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -72,7 +74,7 @@ class _MainShellState extends State<MainShell> {
         .collection('donations')
         .where('uid', isEqualTo: uid)
         .orderBy('createdAt', descending: true)
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .listen((snap) {
       if (!mounted || snap.docs.isEmpty) return;
       final data = snap.docs.first.data();
@@ -99,11 +101,6 @@ class _MainShellState extends State<MainShell> {
     _pageController.dispose();
     super.dispose();
   }
-
-  void _goHub() => setState(() {
-        _showHub = true;
-        _navIndex = 2;
-      });
 
   void _onNavTap(int i) {
     if (i == 2) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'screens/login_screen.dart';
@@ -11,6 +12,9 @@ import 'screens/notifications_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseAuth.instance.authStateChanges().first;
+  await FirebaseAuth.instance.signOut();
+
   runApp(const DonationApp());
 }
 
@@ -57,7 +61,7 @@ class DonationApp extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
         ),
       ),
-      home: const _StartScreen(),
+      home: const _AuthGate(),
       routes: {
         '/start': (context) => const _StartScreen(),
         '/login': (context) => const LoginScreen(),
@@ -65,6 +69,29 @@ class DonationApp extends StatelessWidget {
         '/home': (_) => const MainShell(),
         '/notifications': (_) => const NotificationsScreen(),
         '/new-donation': (_) => const NewDonationScreen(),
+      },
+    );
+  }
+}
+
+class _AuthGate extends StatelessWidget {
+  const _AuthGate();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final user = snap.data;
+        if (user == null) {
+          return const _StartScreen();
+        }
+        return const MainShell();
       },
     );
   }
