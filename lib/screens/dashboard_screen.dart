@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-
+import '../services/firebase_donation_service.dart';
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -62,6 +62,14 @@ class DashboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             const Text("Has cumplido el 60% de tu meta 🎉"),
+            const SizedBox(height: 24),
+
+            const Text(
+              "Análisis: ¿Cuántos días han pasado desde la última donación?",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            _DaysSinceLastDonationCard(),
             const SizedBox(height: 24),
 
             // --- Business Question ---
@@ -212,6 +220,92 @@ class _ActionTile extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary),
         title: Text(title),
         subtitle: Text(date),
+      ),
+    );
+  }
+}
+
+class _DaysSinceLastDonationCard extends StatefulWidget {
+  const _DaysSinceLastDonationCard();
+
+  @override
+  State<_DaysSinceLastDonationCard> createState() => _DaysSinceLastDonationCardState();
+}
+
+class _DaysSinceLastDonationCardState extends State<_DaysSinceLastDonationCard> {
+  final FirebaseDonationService _service = FirebaseDonationService();
+  int? _days;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDays();
+  }
+
+  Future<void> _loadDays() async {
+    print('🔄 Iniciando carga de días...');
+    final result = await _service.getDaysSinceLastDonation();
+    print('✅ Resultado recibido: $result');
+    setState(() {
+      _days = result;
+      _loading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_days == null) {
+      return Card(
+        elevation: 2,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: const [
+              Text("Aún no se pudo calcular tu última donación 💡"),
+              SizedBox(height: 8),
+              Text("Verifica tu conexión o intenta más tarde."),
+            ],
+          ),
+        ),
+      );
+    }
+
+    String message;
+    if (_days == 0) {
+      message = "¡Acabas de donar hoy! 💚";
+    } else if (_days! < 7) {
+      message = "¡Gracias por donar recientemente! 🌱";
+    } else if (_days! < 30) {
+      message = "Hace $_days días desde tu última donación 💫";
+    } else {
+      message = "Han pasado $_days días — ¡Te esperamos pronto! 🤗";
+    }
+
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pushNamed(context, '/new-donation'),
+              icon: const Icon(Icons.volunteer_activism),
+              label: const Text("Donar ahora ❤️"),
+            ),
+          ],
+        ),
       ),
     );
   }
