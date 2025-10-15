@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/donation_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DashboardScreen extends StatelessWidget {
   final DonationItem? lastDonation;
@@ -103,6 +105,8 @@ class DashboardScreen extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 24),
+            const StreakBadgeLive(),
+            const SizedBox(height: 24),
             const Text(
               "Recent activity",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -179,6 +183,62 @@ class _ActionTile extends StatelessWidget {
         title: Text(title),
         subtitle: Text(date),
       ),
+    );
+  }
+}
+
+class StreakBadgeLive extends StatelessWidget {
+  const StreakBadgeLive({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return const SizedBox.shrink();
+
+    final q = FirebaseFirestore.instance
+        .collection('donations')
+        .where('uid', isEqualTo: uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: q,
+      builder: (context, snap) {
+        if (!snap.hasData) return const SizedBox.shrink();
+
+        final days = <DateTime>{};
+        for (final d in snap.data!.docs) {
+          final raw = d.data()['createdAt'];
+          if (raw == null) continue;
+          final dt = raw is Timestamp ? raw.toDate() : raw as DateTime;
+          final local = dt.toLocal();
+          days.add(DateTime(local.year, local.month, local.day));
+        }
+        if (days.isEmpty) return const SizedBox.shrink();
+
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+
+        DateTime latest = days.reduce((a, b) => a.isAfter(b) ? a : b);
+        final isToday = latest == today;
+        final isYesterday = latest == today.subtract(const Duration(days: 1));
+        if (!isToday && !isYesterday) return const SizedBox.shrink();
+
+        int streak = 0;
+        var cursor = latest;
+        while (days.contains(cursor)) {
+          streak += 1;
+          cursor = cursor.subtract(const Duration(days: 1));
+        }
+
+        if (streak <= 0) return const SizedBox.shrink();
+
+        return Row(
+          children: [
+            Chip(label: Text('Streak: $streak days 🔥')),
+          ],
+        );
+      },
     );
   }
 }
