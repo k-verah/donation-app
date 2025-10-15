@@ -67,7 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } on FirebaseAuthException catch (e) {
       _showError(_mapAuthError(e));
     } catch (_) {
-      _showError('Ocurrió un error. Intenta de nuevo.');
+      _showError('An unexpected error occurred. Please try again.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -76,11 +76,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _mapAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':
-        return 'Ese correo ya está registrado.';
+        return 'This email is already registered.';
       case 'network-request-failed':
-        return 'Sin conexión. Revisa tu internet.';
+        return 'No internet connection. Check your network and try again.';
       default:
-        return e.message ?? 'Error de autenticación.';
+        return e.message ?? 'Authentication error. Please try again.';
     }
   }
 
@@ -95,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Crear cuenta')),
+      appBar: AppBar(title: const Text('Create Account')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -106,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 children: [
                   const Text(
-                    'Únete a la red de donadores y voluntarios',
+                    'Join our network of donors and volunteers!',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
@@ -115,11 +115,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _name,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
-                      labelText: 'Nombre',
+                      labelText: 'Name',
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Ingresa tu nombre'
+                        ? 'Enter your name'
                         : null,
                   ),
                   const SizedBox(height: 12),
@@ -128,11 +128,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
-                      labelText: 'Correo',
+                      labelText: 'Email address',
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Ingresa tu correo'
+                        ? 'Enter your email'
                         : null,
                   ),
                   const SizedBox(height: 12),
@@ -141,7 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
-                      labelText: 'Contraseña',
+                      labelText: 'Password',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -150,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _city,
                     textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
-                      labelText: 'Ciudad',
+                      labelText: 'City',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -158,9 +158,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _interests,
                     decoration: const InputDecoration(
-                      labelText: 'Intereses (ej: Donar, Voluntariado)',
+                      labelText: 'Interests (e.g., Donating, Volunteering)',
                       border: OutlineInputBorder(),
-                      hintText: 'Separa con comas',
+                      hintText: 'Separate with commas',
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -178,7 +178,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Crear cuenta'),
+                          : const Text('Create account'),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -187,11 +187,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Navigator.pushNamedAndRemoveUntil(
                           context, '/login', (_) => false);
                     },
-                    child: const Text("¿Ya tienes cuenta? Inicia sesión"),
+                    child: const Text("Already have an account? Log in"),
                   ),
                   TextButton(
                     onPressed: _goStart,
-                    child: const Text("Volver"),
+                    child: const Text("Back"),
                   ),
                 ],
               ),

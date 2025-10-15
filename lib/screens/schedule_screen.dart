@@ -64,7 +64,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             children: [
               const SizedBox(height: 10),
               const Text(
-                "Plan ahead when you want to deliver your items.",
+                "Plan ahead when you want to deliver your items",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),

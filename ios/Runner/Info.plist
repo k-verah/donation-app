@@ -27,11 +27,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Necesitamos la cámara para tomar fotos de tus donaciones.</string>
+	<string>We need access to the camera to take photos of your donations.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Necesitamos tu ubicación para mostrarte puntos cercanos en el mapa.</string>
+	<string>We need your location to show nearby points on the map.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Necesitamos tu galería para seleccionar fotos.</string>
+	<string>We need access to your photo library to select pictures.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

@@ -58,7 +58,7 @@ class _CameraSensorScreenState extends State<CameraSensorScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Cámara'),
+        title: const Text('Camera'),
       ),
       body: (_controller == null)
           ? const Center(child: CircularProgressIndicator())
@@ -96,7 +96,7 @@ class _CameraSensorScreenState extends State<CameraSensorScreen> {
                             shape: const StadiumBorder(),
                           ),
                           icon: const Icon(Icons.camera_alt),
-                          label: const Text('Tomar foto'),
+                          label: const Text('Take photo'),
                         ),
                       ),
                     ),

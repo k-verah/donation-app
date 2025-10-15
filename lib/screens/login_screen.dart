@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final pw = _passwordController.text.trim();
 
     if (email.isEmpty || pw.isEmpty) {
-      _toast('Por favor ingresa correo y contraseña');
+      _toast('Please enter your email and password.');
       return;
     }
 
@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final msg = _mapAuthError(e);
       _toast(msg);
     } catch (e) {
-      _toast('Ocurrió un error inesperado. Intenta de nuevo.');
+      _toast('Something went wrong. Please try again.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -55,19 +55,13 @@ class _LoginScreenState extends State<LoginScreen> {
   String _mapAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-email':
-        return 'Correo inválido.';
-      case 'user-not-found':
-        return 'Usuario no encontrado.';
+        return 'Invalid email or password. Please try again.';
       case 'wrong-password':
-        return 'Contraseña incorrecta.';
-      case 'user-disabled':
-        return 'Usuario deshabilitado.';
-      case 'too-many-requests':
-        return 'Demasiados intentos. Intenta más tarde.';
+        return 'Invalid email or password. Please try again.';
       case 'network-request-failed':
-        return 'Sin conexión. Revisa tu internet.';
+        return 'No internet connection. Check your network and try again.';
       default:
-        return e.message ?? 'Error de autenticación.';
+        return e.message ?? 'Authentication error. Please try again.';
     }
   }
 
@@ -98,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "Iniciar Sesión",
+                  "Sign In",
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 30),
@@ -107,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
-                    labelText: "Correo electrónico",
+                    labelText: "Email address",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -117,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: true,
                   onSubmitted: (_) => _loading ? null : _login(),
                   decoration: const InputDecoration(
-                    labelText: "Contraseña",
+                    labelText: "Password",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -139,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text("Entrar"),
+                      : const Text("Enter"),
                 ),
                 const SizedBox(height: 10),
                 TextButton(
@@ -150,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.pushReplacementNamed(context, '/start');
                     }
                   },
-                  child: const Text("Volver"),
+                  child: const Text("Back"),
                 ),
               ],
             ),

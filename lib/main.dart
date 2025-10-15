@@ -112,18 +112,18 @@ class _StartScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 24),
-                const Text('Te damos la bienvenida',
+                const Text('Welcome Back!',
                     style:
                         TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                const Text('Elige una opción para empezar',
+                const Text('Choose an option to get started',
                     textAlign: TextAlign.center),
                 const SizedBox(height: 28),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () => Navigator.pushNamed(context, '/login'),
-                    child: const Text('Iniciar sesión'),
+                    child: const Text('Log in'),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -131,7 +131,7 @@ class _StartScreen extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () => Navigator.pushNamed(context, '/register'),
-                    child: const Text('Crear cuenta'),
+                    child: const Text('Create account'),
                   ),
                 ),
               ],

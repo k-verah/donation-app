@@ -25,25 +25,26 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
   final _size = TextEditingController();
 
   final _types = const [
-    'Camisa',
-    'Pantalón',
-    'Chaqueta',
-    'Vestido',
-    'Accesorio'
+    'Shirt',
+    'T-Shirt',
+    'Pants',
+    'Jacket',
+    'Dress',
+    'Accessory'
   ];
   String? _type;
 
   final _allTags = const [
-    'Mujer',
-    'Hombre',
-    'Niño',
-    'Invierno',
-    'Verano',
+    'Women',
+    'Men',
+    'Kids',
+    'Winter',
+    'Summer',
     'Formal',
     'Casual',
-    'Deportivo',
-    'Fiesta',
-    'Abrigo'
+    'Sport',
+    'Party',
+    'Coat',
   ];
   final Set<String> _selectedTags = {};
 
@@ -80,8 +81,8 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
       showDialog(
         context: context,
         builder: (_) => const AlertDialog(
-          title: Text('Ha habido un error creando su donación'),
-          content: Text('Por favor revise los datos ingresados.'),
+          title: const Text('There was an error creating your donation.'),
+          content: const Text('Please review the information you entered.'),
         ),
       );
       return;
@@ -120,7 +121,7 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
     final primary = theme.colorScheme.primary;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Nueva Donación')),
+      appBar: AppBar(title: const Text('New Donation')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: Column(
@@ -132,7 +133,7 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
                     fontWeight: FontWeight.w700,
                     color: primary.withOpacity(0.9))),
             const SizedBox(height: 6),
-            Text("Let's find the perfect new home for your pre-loved items.",
+            Text("Let's find the perfect new home for your items.",
                 style: TextStyle(
                     color: theme.colorScheme.onBackground.withOpacity(0.7))),
             const SizedBox(height: 18),
@@ -163,7 +164,7 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
                                   style: GoogleFonts.montserrat(
                                       fontWeight: FontWeight.w600)),
                               const SizedBox(height: 4),
-                              Text('Toca para abrir la cámara',
+                              Text('Touch to open the camera.',
                                   style: TextStyle(
                                       fontSize: 12, color: Colors.black54)),
                             ],
@@ -183,7 +184,7 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
               child: TextButton.icon(
                 onPressed: _pickFromGallery,
                 icon: const Icon(Icons.photo_library),
-                label: const Text('Elegir de la galería'),
+                label: const Text('Choose from library.'),
               ),
             ),
             const SizedBox(height: 12),

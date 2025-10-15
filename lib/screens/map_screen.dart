@@ -17,9 +17,9 @@ class _MapScreenState extends State<MapScreen> {
 
   LatLng? _currentLocation;
 
-  String _selectedCause = "Todos";
-  String _selectedAccess = "Todos";
-  String _selectedSchedule = "Todos";
+  String _selectedCause = "All";
+  String _selectedAccess = "All";
+  String _selectedSchedule = "All";
 
   @override
   void initState() {
@@ -58,7 +58,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mapa de Donación'),
+        title: const Text('Donation Map'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -69,7 +69,6 @@ class _MapScreenState extends State<MapScreen> {
       ),
       body: Column(
         children: [
-          // 🔹 Barra de filtros en una sola fila compacta
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -77,7 +76,7 @@ class _MapScreenState extends State<MapScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedCause,
-                    items: ["Todos", "Ropa", "Alimentos", "Libros"]
+                    items: ["All", "Clothing", "Food", "Books"]
                         .map((cause) => DropdownMenuItem(
                             value: cause,
                             child: Text(cause,
@@ -86,7 +85,7 @@ class _MapScreenState extends State<MapScreen> {
                     onChanged: (value) =>
                         setState(() => _selectedCause = value!),
                     decoration: const InputDecoration(
-                      labelText: "Causa",
+                      labelText: "Cause",
                       labelStyle: TextStyle(fontSize: 12),
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -98,7 +97,7 @@ class _MapScreenState extends State<MapScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedAccess,
-                    items: ["Todos", "Fácil", "Medio", "Difícil"]
+                    items: ["All", "Easy", "Medium", "Difficult"]
                         .map((access) => DropdownMenuItem(
                             value: access,
                             child: Text(access,
@@ -107,7 +106,7 @@ class _MapScreenState extends State<MapScreen> {
                     onChanged: (value) =>
                         setState(() => _selectedAccess = value!),
                     decoration: const InputDecoration(
-                      labelText: "Acceso",
+                      labelText: "Access",
                       labelStyle: TextStyle(fontSize: 12),
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -119,7 +118,7 @@ class _MapScreenState extends State<MapScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedSchedule,
-                    items: ["Todos", "Mañana", "Tarde", "Noche"]
+                    items: ["All", "Morning", "Afternoon", "Night"]
                         .map((schedule) => DropdownMenuItem(
                             value: schedule,
                             child: Text(schedule,
@@ -128,7 +127,7 @@ class _MapScreenState extends State<MapScreen> {
                     onChanged: (value) =>
                         setState(() => _selectedSchedule = value!),
                     decoration: const InputDecoration(
-                      labelText: "Horario",
+                      labelText: "Schedule",
                       labelStyle: TextStyle(fontSize: 12),
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -139,8 +138,6 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           ),
-
-          // 🔹 Mapa con GPS y marcadores
           Expanded(
             child: GoogleMap(
               initialCameraPosition: const CameraPosition(
@@ -156,12 +153,12 @@ class _MapScreenState extends State<MapScreen> {
                 const Marker(
                   markerId: MarkerId("donation1"),
                   position: LatLng(4.65, -74.1),
-                  infoWindow: InfoWindow(title: "Punto de donación 1"),
+                  infoWindow: InfoWindow(title: "Donation point 1"),
                 ),
                 const Marker(
                   markerId: MarkerId("donation2"),
                   position: LatLng(4.68, -74.05),
-                  infoWindow: InfoWindow(title: "Punto de donación 2"),
+                  infoWindow: InfoWindow(title: "Donation point 2"),
                 ),
               },
             ),

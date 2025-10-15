@@ -6,13 +6,18 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = const [
-      _Campaign(title: "Abriga un Niño", desc: "Ropa de invierno para niños en zonas rurales."),
-      _Campaign(title: "Verano Solidario", desc: "Camisetas y sandalias para familias en climas cálidos."),
-      _Campaign(title: "Apoyo a Madres", desc: "Ropa de maternidad y para bebés."),
+      _Campaign(
+          title: "Warm a Child",
+          desc: "Winter clothing for children in rural areas."),
+      _Campaign(
+          title: "Summer Solidarity",
+          desc: "T-shirts and sandals for families in warm climates."),
+      _Campaign(
+          title: "Support for Mothers", desc: "Maternity and baby clothing."),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Campañas activas")),
+      appBar: AppBar(title: const Text("Active Campaigns")),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: items.length,
@@ -22,8 +27,10 @@ class NotificationsScreen extends StatelessWidget {
           return Card(
             elevation: 2,
             child: ListTile(
-              leading: Icon(Icons.campaign, color: Theme.of(context).colorScheme.primary),
-              title: Text(c.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              leading: Icon(Icons.campaign,
+                  color: Theme.of(context).colorScheme.primary),
+              title: Text(c.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(c.desc),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {},

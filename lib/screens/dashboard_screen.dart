@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import '../services/firebase_donation_service.dart';
+import '../models/donation_item.dart';
+
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final DonationItem? lastDonation;
+  const DashboardScreen({super.key, this.lastDonation});
 
   @override
   Widget build(BuildContext context) {
     // Datos estáticos para el prototipo
-    const donations = 12;
-    const beneficiaries = 30;
-    const recycledKg = 45;
     const goalProgress = 0.6;
+
+    String? _daysMessageFrom(DateTime? last) {
+      if (last == null) return null;
+      final now = DateTime.now();
+      final days = DateTime(now.year, now.month, now.day)
+          .difference(DateTime(last.year, last.month, last.day))
+          .inDays;
+
+      if (days == 0) return "You just donated today!";
+
+      return "It's been $days days since your last donation.\nWe hope to see you again soon!";
+    }
+
+    final daysMsg = _daysMessageFrom(lastDonation?.createdAt);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi Impacto'),
+        title: const Text('My Impact'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -29,27 +41,25 @@ class DashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Resumen de donaciones",
+              "Donation summary",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Row(
               children: const [
                 _ImpactCard(
-                    icon: Icons.favorite, value: "12", label: "Donaciones"),
+                    icon: Icons.favorite, value: "12", label: "Donations"),
                 SizedBox(width: 12),
                 _ImpactCard(
-                    icon: Icons.people, value: "30", label: "Beneficiarios"),
+                    icon: Icons.people, value: "30", label: "Beneficiaries"),
                 SizedBox(width: 12),
                 _ImpactCard(
-                    icon: Icons.recycling,
-                    value: "45kg",
-                    label: "Ropa reciclada"),
+                    icon: Icons.recycling, value: "45kg", label: "Clothes"),
               ],
             ),
             const SizedBox(height: 24),
             const Text(
-              "Meta anual",
+              "Annual goal",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -61,104 +71,52 @@ class DashboardScreen extends StatelessWidget {
                   Theme.of(context).colorScheme.primary.withOpacity(0.2),
             ),
             const SizedBox(height: 6),
-            const Text("Has cumplido el 60% de tu meta 🎉"),
+            const Text("You’ve reached 60% of your goal!"),
             const SizedBox(height: 24),
-
-            const Text(
-              "Análisis: ¿Cuántos días han pasado desde la última donación?",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            _DaysSinceLastDonationCard(),
-            const SizedBox(height: 24),
-
-            // --- Business Question ---
-            const Text(
-              "Análisis: ¿En qué horarios se realizan más donaciones?",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            AspectRatio(
-              aspectRatio: 1.6,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: 10,
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          const labels = ['Mañana', 'Tarde', 'Noche'];
-                          if (value.toInt() < labels.length) {
-                            return Text(labels[value.toInt()]);
-                          }
-                          return const SizedBox();
-                        },
+            if (daysMsg != null) ...[
+              const Text(
+                "How many days since your last donation?",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(daysMsg,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16)),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/new-donation'),
+                        icon: const Icon(Icons.volunteer_activism),
+                        label: const Text("Donate now"),
                       ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles:
-                          SideTitles(showTitles: true, reservedSize: 28),
-                    ),
+                    ],
                   ),
-                  barGroups: [
-                    BarChartGroupData(
-                      x: 0,
-                      barRods: [
-                        BarChartRodData(
-                          toY: 5,
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 20,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ],
-                    ),
-                    BarChartGroupData(
-                      x: 1,
-                      barRods: [
-                        BarChartRodData(
-                          toY: 8,
-                          color: Theme.of(context).colorScheme.secondary,
-                          width: 20,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ],
-                    ),
-                    BarChartGroupData(
-                      x: 2,
-                      barRods: [
-                        BarChartRodData(
-                          toY: 3,
-                          color: Colors.teal[200],
-                          width: 20,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ],
-                    ),
-                  ],
                 ),
               ),
-            ),
+            ],
             const SizedBox(height: 24),
-
             const Text(
-              "Últimas acciones",
+              "Recent activity",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             ...const [
               _ActionTile(
-                  title: "Donaste 3 prendas a Fundación Niñez Feliz",
-                  date: "Ayer"),
+                  title: "You donated 3 items to Fundación Niñez Feliz.",
+                  date: "Yesterday"),
               _ActionTile(
-                  title: "Agregaste Abrigo para Todos a favoritos",
-                  date: "Hace 2 días"),
+                  title: "You added 'Coat for Everyone' to favorites.",
+                  date: "2 days ago"),
               _ActionTile(
-                  title: "Te registraste como voluntario",
-                  date: "Hace 1 semana"),
+                  title: "You registered as a volunteer.", date: "1 week ago"),
             ],
           ],
         ),
@@ -220,92 +178,6 @@ class _ActionTile extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary),
         title: Text(title),
         subtitle: Text(date),
-      ),
-    );
-  }
-}
-
-class _DaysSinceLastDonationCard extends StatefulWidget {
-  const _DaysSinceLastDonationCard();
-
-  @override
-  State<_DaysSinceLastDonationCard> createState() => _DaysSinceLastDonationCardState();
-}
-
-class _DaysSinceLastDonationCardState extends State<_DaysSinceLastDonationCard> {
-  final FirebaseDonationService _service = FirebaseDonationService();
-  int? _days;
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDays();
-  }
-
-  Future<void> _loadDays() async {
-    print('🔄 Iniciando carga de días...');
-    final result = await _service.getDaysSinceLastDonation();
-    print('✅ Resultado recibido: $result');
-    setState(() {
-      _days = result;
-      _loading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_days == null) {
-      return Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: const [
-              Text("Aún no se pudo calcular tu última donación 💡"),
-              SizedBox(height: 8),
-              Text("Verifica tu conexión o intenta más tarde."),
-            ],
-          ),
-        ),
-      );
-    }
-
-    String message;
-    if (_days == 0) {
-      message = "¡Acabas de donar hoy! 💚";
-    } else if (_days! < 7) {
-      message = "¡Gracias por donar recientemente! 🌱";
-    } else if (_days! < 30) {
-      message = "Hace $_days días desde tu última donación 💫";
-    } else {
-      message = "Han pasado $_days días — ¡Te esperamos pronto! 🤗";
-    }
-
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () => Navigator.pushNamed(context, '/new-donation'),
-              icon: const Icon(Icons.volunteer_activism),
-              label: const Text("Donar ahora ❤️"),
-            ),
-          ],
-        ),
       ),
     );
   }

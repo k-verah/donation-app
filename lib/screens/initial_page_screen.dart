@@ -38,17 +38,25 @@ class _MainShellState extends State<MainShell> {
   Timer? _autoTimer;
 
   final _banners = const [
-    _BannerCard(texto: 'Dale nueva vida a tu ropa'),
-    _BannerCard(texto: 'Agenda una recolección a domicilio'),
-    _BannerCard(texto: 'Tu impacto ayuda a más familias'),
+    _BannerCard(texto: 'Give your clothes a second life'),
+    _BannerCard(texto: 'Book a pickup at home'),
+    _BannerCard(texto: 'Your impact reaches more families'),
   ];
 
-  final _screens = const [
-    MapScreen(),
-    ScheduleScreen(),
-    DashboardScreen(),
-    PickupScreen(),
-  ];
+  Widget _buildScreen() {
+    switch (_screenIndex) {
+      case 0:
+        return const MapScreen();
+      case 1:
+        return const ScheduleScreen();
+      case 2:
+        return DashboardScreen(lastDonation: _lastDonation);
+      case 3:
+        return const PickupScreen();
+      default:
+        return const MapScreen();
+    }
+  }
 
   @override
   void initState() {
@@ -119,7 +127,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget body = _showHub ? _buildHub(context) : _screens[_screenIndex];
+    final Widget body = _showHub ? _buildHub(context) : _buildScreen();
 
     return Scaffold(
       appBar: _showHub
@@ -135,22 +143,22 @@ class _MainShellState extends State<MainShell> {
           NavigationDestination(
             icon: Icon(Icons.map_outlined),
             selectedIcon: Icon(Icons.map),
-            label: 'Mapa',
+            label: 'Map',
           ),
           NavigationDestination(
             icon: Icon(Icons.event_available_outlined),
             selectedIcon: Icon(Icons.event_available),
-            label: 'Agendar',
+            label: 'Schedule',
           ),
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
-            label: 'Inicio',
+            label: 'Home',
           ),
           NavigationDestination(
             icon: Icon(Icons.insights_outlined),
             selectedIcon: Icon(Icons.insights),
-            label: 'Impacto',
+            label: 'Impact',
           ),
           NavigationDestination(
             icon: Icon(Icons.local_shipping_outlined),
@@ -207,7 +215,7 @@ class _MainShellState extends State<MainShell> {
                           }
                         },
                         icon: const Icon(Icons.add),
-                        label: const Text('Nueva Donación'),
+                        label: const Text('New Donation'),
                       ),
                     ),
 
@@ -233,7 +241,7 @@ class _MainShellState extends State<MainShell> {
                         },
                         icon: const Icon(Icons.my_location),
                         label: const Text(
-                          'Ubicar fundaciones más cercanas',
+                          'Locate nearby foundations',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -285,7 +293,7 @@ class _MainShellState extends State<MainShell> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Mis Donaciones',
+                  'My Donations',
                   style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -443,7 +451,7 @@ class _HubAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(
-          tooltip: 'Campañas y avisos',
+          tooltip: 'Campaings and notifications',
           onPressed: onBell,
           icon: const Icon(Icons.notifications_none),
         ),

@@ -21,7 +21,7 @@ class _PickupScreenState extends State<PickupScreen> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Activa la ubicación para continuar")),
+        const SnackBar(content: Text("Enable location services to continue.")),
       );
       return;
     }
@@ -73,14 +73,14 @@ class _PickupScreenState extends State<PickupScreen> {
         _dateController.text.isEmpty ||
         _timeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Por favor completa todos los campos")),
+        const SnackBar(content: Text("Please fill out all fields.")),
       );
       return;
     }
 
     // Simulación de llamada externa (servicio externo)
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("¡Recogida confirmada con éxito!")),
+      const SnackBar(content: Text("Pickup confirmed successfully!")),
     );
   }
 
@@ -107,7 +107,7 @@ class _PickupScreenState extends State<PickupScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            Text("Selecciona los detalles para tu recogida",
+            Text("Select the details for your pickup",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.montserrat(
                     fontSize: 16, fontWeight: FontWeight.w500)),
@@ -117,7 +117,7 @@ class _PickupScreenState extends State<PickupScreen> {
               readOnly: true,
               onTap: _getCurrentLocation,
               decoration: InputDecoration(
-                labelText: "Seleccionar ubicación",
+                labelText: "Select location",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -129,7 +129,7 @@ class _PickupScreenState extends State<PickupScreen> {
               readOnly: true,
               onTap: _selectDate,
               decoration: InputDecoration(
-                labelText: "Seleccionar fecha",
+                labelText: "Select date",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -141,7 +141,7 @@ class _PickupScreenState extends State<PickupScreen> {
               readOnly: true,
               onTap: _selectTime,
               decoration: InputDecoration(
-                labelText: "Seleccionar hora",
+                labelText: "Select time",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -158,7 +158,7 @@ class _PickupScreenState extends State<PickupScreen> {
                     borderRadius: BorderRadius.circular(20)),
               ),
               child: Text(
-                "Confirmar",
+                "Confirm",
                 style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
