@@ -8,18 +8,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: ^2.7.0
-  google_fonts: ^6.1.0
+  google_maps_flutter: ^2.13.1
+  google_fonts: ^6.3.2
   charts_flutter: ^0.12.0
   shared_preferences: ^2.2.0
-  geolocator: ^9.0.2
+  geolocator: ^14.0.2
   permission_handler: ^11.0.1
   image_picker: ^1.2.0
   camera: ^0.11.2
   fl_chart: ^0.68.0
-  firebase_core:
-  firebase_auth:
-  cloud_firestore:
+  firebase_core: ^4.2.0
+  firebase_auth: ^6.1.1
+  cloud_firestore: ^6.0.3
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:

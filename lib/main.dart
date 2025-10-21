@@ -1,142 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'composition_root.dart';
+import 'config/theme/app_theme.dart';
 
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/initial_page_screen.dart';
-import 'screens/new_donation_screen.dart';
-import 'screens/notifications_screen.dart';
+// Screens
+import 'presentation/screens/auth_gate.dart';
+import 'presentation/screens/start_screen.dart';
+import 'presentation/screens/login_screen.dart';
+import 'presentation/screens/register_screen.dart';
+import 'presentation/screens/initial_page_screen.dart';
+import 'presentation/screens/new_donation_screen.dart';
+import 'presentation/screens/notifications_screen.dart';
+import 'presentation/screens/schedule_screen.dart';
+import 'presentation/screens/pickup_screen.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAuth.instance.authStateChanges().first;
-  await FirebaseAuth.instance.signOut();
-
-  runApp(const DonationApp());
+  runApp(const Recyclothes());
 }
 
-class DonationApp extends StatelessWidget {
-  const DonationApp({super.key});
+class Recyclothes extends StatelessWidget {
+  const Recyclothes({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF003137);
-    const secondary = Color(0xFF6F9AA0);
-    const background = Color(0xFFAFC7CA);
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Recyclothes',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme(
-          brightness: Brightness.light,
-          primary: primary,
-          onPrimary: Colors.white,
-          secondary: secondary,
-          onSecondary: Colors.white,
-          background: background,
-          onBackground: Colors.black87,
-          surface: Colors.white,
-          onSurface: Colors.black87,
-          error: Colors.red.shade700,
-          onError: Colors.white,
-        ),
-        scaffoldBackgroundColor: background,
-        textTheme: GoogleFonts.montserratTextTheme(),
-        appBarTheme: AppBarTheme(
-          backgroundColor: primary,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          titleTextStyle: GoogleFonts.montserrat(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          type: BottomNavigationBarType.fixed,
-        ),
-      ),
-      home: const _AuthGate(),
-      routes: {
-        '/start': (context) => const _StartScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (_) => const MainShell(),
-        '/notifications': (_) => const NotificationsScreen(),
-        '/new-donation': (_) => const NewDonationScreen(),
-      },
-    );
-  }
-}
-
-class _AuthGate extends StatelessWidget {
-  const _AuthGate();
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final user = snap.data;
-        if (user == null) {
-          return const _StartScreen();
-        }
-        return const MainShell();
-      },
-    );
-  }
-}
-
-class _StartScreen extends StatelessWidget {
-  const _StartScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 24),
-                const Text('Welcome Back!',
-                    style:
-                        TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                const Text('Choose an option to get started',
-                    textAlign: TextAlign.center),
-                const SizedBox(height: 28),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () => Navigator.pushNamed(context, '/login'),
-                    child: const Text('Log in'),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pushNamed(context, '/register'),
-                    child: const Text('Create account'),
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return MultiProvider(
+      providers: CompositionRoot.providers(),
+      child: Builder(
+        builder: (context) => MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Recyclothes',
+          theme: AppTheme.light(),
+          home: const AuthGate(),
+          routes: {
+            '/start': (_) => const StartScreen(),
+            '/login': (_) => const LoginScreen(),
+            '/register': (_) => const RegisterScreen(),
+            '/home': (_) => const HomeScreen(),
+            '/new-donation': (_) => const NewDonationScreen(),
+            '/notifications': (_) => const NotificationsScreen(),
+            '/schedule': (_) => const ScheduleScreen(),
+            '/pickup': (_) => const PickupScreen(),
+          },
         ),
       ),
     );
