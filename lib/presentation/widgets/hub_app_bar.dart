@@ -37,13 +37,6 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
               onViewDonations();
             } else if (value == 'logout') {
               await context.read<AuthProvider>().signOut();
-              if (context.mounted) {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/login',
-                  (route) => false,
-                );
-              }
             }
           },
           itemBuilder: (context) => [
