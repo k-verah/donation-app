@@ -1,3 +1,4 @@
+import 'package:donation_app/presentation/screens/donations_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,7 @@ import 'presentation/screens/auth_gate.dart';
 import 'presentation/screens/start_screen.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/register_screen.dart';
-import 'presentation/screens/initial_page_screen.dart';
+import 'presentation/screens/home_screen.dart';
 import 'presentation/screens/new_donation_screen.dart';
 import 'presentation/screens/notifications_screen.dart';
 import 'presentation/screens/schedule_screen.dart';
@@ -39,6 +40,7 @@ class Recyclothes extends StatelessWidget {
             '/login': (_) => const LoginScreen(),
             '/register': (_) => const RegisterScreen(),
             '/home': (_) => const HomeScreen(),
+            '/donations': (_) => const DonationsScreen(),
             '/new-donation': (_) => const NewDonationScreen(),
             '/notifications': (_) => const NotificationsScreen(),
             '/schedule': (_) => const ScheduleScreen(),

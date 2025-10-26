@@ -1,5 +1,5 @@
 import 'package:donation_app/presentation/providers/auth/auth_provider.dart';
-import 'package:donation_app/presentation/screens/initial_page_screen.dart';
+import 'package:donation_app/presentation/screens/home_screen.dart';
 import 'package:donation_app/presentation/screens/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

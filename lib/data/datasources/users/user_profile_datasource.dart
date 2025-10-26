@@ -19,4 +19,9 @@ class UserProfileDataSource {
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
+
+  Future<Map<String, dynamic>?> getProfile(String uid) async {
+    final doc = await _db.collection('users').doc(uid).get();
+    return doc.exists ? doc.data() : null;
+  }
 }

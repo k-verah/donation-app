@@ -16,7 +16,6 @@ class _PickupScreenState extends State<PickupScreen> {
   final TextEditingController _timeController = TextEditingController();
 
   Future<void> _fillWithCurrentLocation() async {
-    // Pide la ubicación actual a través del provider (usa tu GetCurrentLocation)
     final locProv = context.read<LocationProvider>();
     final point = await locProv.getCurrentLocation();
     if (!mounted) return;

@@ -14,7 +14,16 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+      ),
       onPressed: loading ? null : onPressed,
       child: loading
           ? const SizedBox(

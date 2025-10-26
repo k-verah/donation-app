@@ -9,15 +9,36 @@ class AuthRepositoryImpl implements AuthRepository {
   final UserProfileDataSource profileds;
   AuthRepositoryImpl(this.authds, this.profileds);
 
-  AuthUser _toDomain(fb.User u) => AuthUser(uid: u.uid, email: u.email);
+  AuthUser _toDomain(fb.User u, {Map<String, dynamic>? profile}) {
+    return AuthUser(
+      uid: u.uid,
+      email: u.email,
+      name: profile?['name'],
+      city: profile?['city'],
+      interests: profile?['interests'] != null
+          ? List<String>.from(profile!['interests'])
+          : null,
+    );
+  }
 
   @override
-  Stream<AuthUser?> authStateChanges() =>
-      authds.authState().map((u) => u == null ? null : _toDomain(u));
+  Stream<AuthUser?> authStateChanges() async* {
+    await for (final u in authds.authState()) {
+      if (u == null) {
+        yield null;
+      } else {
+        final profile = await profileds.getProfile(u.uid);
+        yield _toDomain(u, profile: profile);
+      }
+    }
+  }
 
   @override
-  AuthUser? get currentUser =>
-      authds.current == null ? null : _toDomain(authds.current!);
+  AuthUser? get currentUser {
+    final u = authds.current;
+    if (u == null) return null;
+    return _toDomain(u);
+  }
 
   @override
   Future<AuthUser> signIn({
@@ -49,7 +70,8 @@ class AuthRepositoryImpl implements AuthRepository {
         city: city,
         interests: interests,
       );
-      return _toDomain(u);
+      final profile = await profileds.getProfile(u.uid);
+      return _toDomain(u, profile: profile);
     } on fb.FirebaseAuthException {
       throw Exception();
     }
