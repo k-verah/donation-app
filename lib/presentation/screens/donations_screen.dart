@@ -23,7 +23,7 @@ class DonationsScreen extends StatelessWidget {
           final donations = snapshot.data ?? [];
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: Text('Loading your donations...'));
           }
 
           if (donations.isEmpty) {
