@@ -56,7 +56,7 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
               value: 'logout',
               child: Row(
                 children: [
-                  Icon(Icons.logout, color: Colors.redAccent),
+                  Icon(Icons.logout, color: Colors.blueGrey),
                   SizedBox(width: 8),
                   Text('Sign Out'),
                 ],
