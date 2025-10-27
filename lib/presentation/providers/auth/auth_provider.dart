@@ -13,30 +13,20 @@ class AuthProvider extends ChangeNotifier {
   final SignUp _signUp;
   final SignOut _signOut;
   final GetAuthState _getAuthState;
-  bool get loading =>
-      _status == AuthStatus.loading || _status == AuthStatus.unknown;
-  bool get isAuthenticated => _status == AuthStatus.authenticated;
 
+  AuthStatus status = AuthStatus.unknown;
   AuthUser? _user;
-  AuthUser? get user => _user;
-
-  AuthStatus _status = AuthStatus.unknown;
-  AuthStatus get status => _status;
-
   StreamSubscription<AuthUser?>? _sub;
 
-  AuthProvider({
-    required SignIn signIn,
-    required SignUp signUp,
-    required SignOut signOut,
-    required GetAuthState getAuthState,
-  })  : _signIn = signIn,
-        _signUp = signUp,
-        _signOut = signOut,
-        _getAuthState = getAuthState {
+  bool get loading =>
+      status == AuthStatus.loading || status == AuthStatus.unknown;
+  bool get isAuthenticated => status == AuthStatus.authenticated;
+  AuthUser? get user => _user;
+
+  AuthProvider(this._signIn, this._signUp, this._signOut, this._getAuthState) {
     _sub = _getAuthState().listen((u) {
       _user = u;
-      _status =
+      status =
           (u == null) ? AuthStatus.unauthenticated : AuthStatus.authenticated;
       notifyListeners();
     });
@@ -47,13 +37,13 @@ class AuthProvider extends ChangeNotifier {
     await _signIn(email, password);
   }
 
-  Future<void> signUp(
-    String name,
-    String email,
-    String password,
-    String city,
-    List<String> interests,
-  ) async {
+  Future<void> signUp({
+    required String name,
+    required String email,
+    required String password,
+    required String city,
+    required List<String> interests,
+  }) async {
     _setLoading();
     await _signUp(
       name: name,
@@ -70,7 +60,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void _setLoading() {
-    _status = AuthStatus.loading;
+    status = AuthStatus.loading;
     notifyListeners();
   }
 

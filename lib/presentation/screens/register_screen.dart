@@ -37,12 +37,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
     final interests = _parseInterests(_interests.text);
     await context.read<AuthProvider>().signUp(
-      _name.text.trim(),
-      _email.text.trim(),
-      _pass.text.trim(),
-      _city.text.trim(),
-      interests,
-    );
+          name: _name.text.trim(),
+          email: _email.text.trim(),
+          password: _pass.text.trim(),
+          city: _city.text.trim(),
+          interests: interests,
+        );
   }
 
   @override

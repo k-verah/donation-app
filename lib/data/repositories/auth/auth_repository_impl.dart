@@ -15,22 +15,21 @@ class AuthRepositoryImpl implements AuthRepository {
       email: u.email,
       name: profile?['name'],
       city: profile?['city'],
-      interests: profile?['interests'] != null
-          ? List<String>.from(profile!['interests'])
-          : null,
+      interests: (profile?['interests'] as List?)?.cast<String>(),
     );
   }
 
   @override
-  Stream<AuthUser?> authStateChanges() async* {
-    await for (final u in authds.authState()) {
-      if (u == null) {
-        yield null;
-      } else {
+  Stream<AuthUser?> authStateChanges() {
+    return authds.authState().asyncMap((u) async {
+      if (u == null) return null;
+      try {
         final profile = await profileds.getProfile(u.uid);
-        yield _toDomain(u, profile: profile);
+        return _toDomain(u, profile: profile);
+      } catch (_) {
+        return _toDomain(u);
       }
-    }
+    });
   }
 
   @override
@@ -41,10 +40,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthUser> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<AuthUser> signIn(
+      {required String email, required String password}) async {
     try {
       final u = await authds.signIn(email, password);
       return _toDomain(u);
@@ -63,15 +60,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       final u = await authds.signUp(email, password);
-      await profileds.saveProfile(
+      profileds.saveProfile(
         uid: u.uid,
         name: name,
         email: email,
         city: city,
         interests: interests,
       );
-      final profile = await profileds.getProfile(u.uid);
-      return _toDomain(u, profile: profile);
+
+      return _toDomain(u,
+          profile: {'name': name, 'city': city, 'interests': interests});
     } on fb.FirebaseAuthException {
       throw Exception();
     }

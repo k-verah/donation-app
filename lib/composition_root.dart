@@ -90,10 +90,10 @@ class CompositionRoot {
     return [
       ChangeNotifierProvider(
         create: (_) => AuthProvider(
-          signIn: signIn,
-          signUp: signUp,
-          signOut: signOut,
-          getAuthState: getAuthState,
+          signIn,
+          signUp,
+          signOut,
+          getAuthState,
         ),
       ),
       ChangeNotifierProvider(
