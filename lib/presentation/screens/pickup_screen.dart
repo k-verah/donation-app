@@ -64,7 +64,6 @@ class _PickupScreenState extends State<PickupScreen> {
       );
       return;
     }
-    // Simulación de integración externa (cuando la tengas, muévela a un use case)
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Pickup confirmed successfully!")),
     );
@@ -77,110 +76,115 @@ class _PickupScreenState extends State<PickupScreen> {
     const background = Color(0xFFAFC7CA);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('PickUp at Home'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(
-            context,
-          ).pushNamedAndRemoveUntil('/home', (route) => false),
+          onPressed: () => Navigator.of(context)
+              .pushNamedAndRemoveUntil('/home', (route) => false),
         ),
       ),
       backgroundColor: background,
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            Text(
-              "Select the details for your pickup",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 24),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final kb = MediaQuery.of(context).viewInsets.bottom;
+            final safe = MediaQuery.of(context).padding.bottom;
 
-            // Ubicación
-            TextField(
-              controller: _locationController,
-              readOnly: true,
-              onTap: _fillWithCurrentLocation, // 👈 usa provider
-              decoration: InputDecoration(
-                labelText: "Select location",
-                hintText: "Tap to use current location",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.my_location),
-                  onPressed: _fillWithCurrentLocation,
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + kb + safe),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 8),
+                    Text(
+                      "Select the details for your pickup",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: _locationController,
+                      readOnly: true,
+                      onTap: _fillWithCurrentLocation,
+                      decoration: InputDecoration(
+                        labelText: "Select location",
+                        hintText: "Tap to use current location",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.my_location),
+                          onPressed: _fillWithCurrentLocation,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _dateController,
+                      readOnly: true,
+                      onTap: _selectDate,
+                      decoration: InputDecoration(
+                        labelText: "Select date",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: _selectDate,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _timeController,
+                      readOnly: true,
+                      onTap: _selectTime,
+                      decoration: InputDecoration(
+                        labelText: "Select time",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.access_time),
+                          onPressed: _selectTime,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    ElevatedButton(
+                      onPressed: _confirmPickup,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 80,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        "Confirm",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-
-            // Fecha
-            TextField(
-              controller: _dateController,
-              readOnly: true,
-              onTap: _selectDate,
-              decoration: InputDecoration(
-                labelText: "Select date",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: _selectDate,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Hora
-            TextField(
-              controller: _timeController,
-              readOnly: true,
-              onTap: _selectTime,
-              decoration: InputDecoration(
-                labelText: "Select time",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.access_time),
-                  onPressed: _selectTime,
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-
-            // Confirmar
-            ElevatedButton(
-              onPressed: _confirmPickup,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primary,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 80,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Text(
-                "Confirm",
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

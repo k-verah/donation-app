@@ -166,48 +166,63 @@ class _HubView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
-    return SafeArea(
-      child: Column(
-        children: [
-          const SizedBox(height: 8),
-
-          PrimaryActions(
-            onNewDonation: onNewDonation,
-            onGoToMap: onGoToMap,
-          ),
-
-          // Carrusel de banners
-          const Expanded(child: BannerCarousel()),
-
-          if (lastDonation != null) ...[
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'My Latest Donation',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.onBackground,
-                  ),
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(height: 8),
+        PrimaryActions(
+          onNewDonation: onNewDonation,
+          onGoToMap: onGoToMap,
+        ),
+        const SizedBox(height: 12),
+        isLandscape
+            ? SizedBox(
+                height: 180,
+                child: BannerCarousel(),
+              )
+            : const Expanded(
+                child: BannerCarousel(),
+              ),
+        if (lastDonation != null) ...[
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'My Latest Donation',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: theme.colorScheme.onBackground,
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: LastDonationCard(
-                donation: lastDonation!,
-                localImagePathOverride: lastLocalPath,
-              ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: LastDonationCard(
+              donation: lastDonation!,
+              localImagePathOverride: lastLocalPath,
             ),
-          ],
-          const SizedBox(height: 12),
+          ),
         ],
-      ),
+        const SizedBox(height: 12),
+      ],
+    );
+    return SafeArea(
+      child: isLandscape
+          ? SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: content,
+              ),
+            )
+          : content,
     );
   }
 }
