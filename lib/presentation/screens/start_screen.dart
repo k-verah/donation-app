@@ -29,7 +29,10 @@ class StartScreen extends StatelessWidget {
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: () => Navigator.pushNamed(context, '/register'),
-            child: const Text('Create account'),
+            child: const Text(
+              'Create account',
+              style: TextStyle(fontWeight: FontWeight.normal),
+            ),
           ),
         ],
       ),
