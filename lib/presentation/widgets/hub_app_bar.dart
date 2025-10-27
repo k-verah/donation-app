@@ -50,7 +50,7 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
             const PopupMenuDivider(),
             const PopupMenuItem<String>(
               value: 'donations',
-              child: Text('My donations'),
+              child: Text('My Donations'),
             ),
             const PopupMenuItem<String>(
               value: 'logout',
