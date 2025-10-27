@@ -40,13 +40,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthUser> signIn(
-      {required String email, required String password}) async {
+  Future<AuthUser> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       final u = await authds.signIn(email, password);
       return _toDomain(u);
-    } on fb.FirebaseAuthException {
-      throw Exception();
+    } on fb.FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw Exception('Invalid credentials. Please try again');
+      } else if (e.code == 'wrong-password') {
+        throw Exception('Invalid credentials. Please try again.');
+      } else {
+        throw Exception('An error occurred while signing in.');
+      }
     }
   }
 
@@ -60,18 +68,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       final u = await authds.signUp(email, password);
-      profileds.saveProfile(
+      await profileds.saveProfile(
         uid: u.uid,
         name: name,
         email: email,
         city: city,
         interests: interests,
       );
-
-      return _toDomain(u,
-          profile: {'name': name, 'city': city, 'interests': interests});
-    } on fb.FirebaseAuthException {
-      throw Exception();
+      return _toDomain(u, profile: {
+        'name': name,
+        'city': city,
+        'interests': interests,
+      });
+    } on fb.FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        throw Exception(
+          'This email is already registered. Would you like to sign in instead?',
+        );
+      } else {
+        throw Exception('An error occurred while creating your account.');
+      }
     }
   }
 

@@ -26,6 +26,7 @@ class Recyclothes extends StatelessWidget {
   const Recyclothes({super.key});
 
   static final _navKey = GlobalKey<NavigatorState>();
+  static final messengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +35,7 @@ class Recyclothes extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: _navKey,
+        scaffoldMessengerKey: messengerKey,
         title: 'Recyclothes',
         theme: AppTheme.light(),
         home: const StartScreen(),
@@ -71,14 +73,14 @@ class _AuthRedirector extends StatefulWidget {
 class _AuthRedirectorState extends State<_AuthRedirector> {
   AuthStatus? _last;
 
-  void _maybeRedirect(AuthStatus status) {
+  void _maybeRedirect(AuthStatus status, bool hasError) {
     if (_last == status) return;
     _last = status;
 
     if (status == AuthStatus.authenticated) {
       widget.navKey.currentState
           ?.pushNamedAndRemoveUntil('/home', (route) => false);
-    } else if (status == AuthStatus.unauthenticated) {
+    } else if (status == AuthStatus.unauthenticated && !hasError) {
       widget.navKey.currentState
           ?.pushNamedAndRemoveUntil('/start', (route) => false);
     }
@@ -87,7 +89,10 @@ class _AuthRedirectorState extends State<_AuthRedirector> {
   @override
   Widget build(BuildContext context) {
     final status = context.select<AuthProvider, AuthStatus>((a) => a.status);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeRedirect(status));
+    final hasError =
+        context.select<AuthProvider, bool>((a) => a.lastError != null);
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _maybeRedirect(status, hasError));
     if (status == AuthStatus.unknown || status == AuthStatus.loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),

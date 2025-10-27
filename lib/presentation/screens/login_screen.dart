@@ -1,3 +1,4 @@
+import 'package:donation_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth/auth_provider.dart';
@@ -26,10 +27,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    await context.read<AuthProvider>().signIn(
-          _email.text.trim(),
-          _pass.text.trim(),
-        );
+
+    try {
+      await context.read<AuthProvider>().signIn(
+            _email.text.trim(),
+            _pass.text.trim(),
+          );
+    } catch (e) {
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final provider = context.read<AuthProvider>();
+      messenger
+          .showSnackBar(
+            SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+          )
+          .closed
+          .then((_) {
+        if (mounted) provider.clearError();
+      });
+    }
   }
 
   @override

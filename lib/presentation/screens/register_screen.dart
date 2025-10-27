@@ -1,3 +1,4 @@
+import 'package:donation_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth/auth_provider.dart';
@@ -36,13 +37,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
     final interests = _parseInterests(_interests.text);
-    await context.read<AuthProvider>().signUp(
-          name: _name.text.trim(),
-          email: _email.text.trim(),
-          password: _pass.text.trim(),
-          city: _city.text.trim(),
-          interests: interests,
-        );
+
+    try {
+      await context.read<AuthProvider>().signUp(
+            name: _name.text.trim(),
+            email: _email.text.trim(),
+            password: _pass.text.trim(),
+            city: _city.text.trim(),
+            interests: interests,
+          );
+    } catch (e) {
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final provider = context.read<AuthProvider>();
+      messenger
+          .showSnackBar(
+            SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+          )
+          .closed
+          .then((_) {
+        if (mounted) provider.clearError();
+      });
+    }
   }
 
   @override

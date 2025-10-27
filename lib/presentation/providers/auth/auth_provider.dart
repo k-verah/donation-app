@@ -13,6 +13,7 @@ class AuthProvider extends ChangeNotifier {
   final SignUp _signUp;
   final SignOut _signOut;
   final GetAuthState _getAuthState;
+  String? lastError;
 
   AuthStatus status = AuthStatus.unknown;
   AuthUser? _user;
@@ -34,7 +35,14 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signIn(String email, String password) async {
     _setLoading();
-    await _signIn(email, password);
+    try {
+      await _signIn(email, password);
+    } catch (e) {
+      _setError(e);
+      status = AuthStatus.unauthenticated;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> signUp({
@@ -45,13 +53,20 @@ class AuthProvider extends ChangeNotifier {
     required List<String> interests,
   }) async {
     _setLoading();
-    await _signUp(
-      name: name,
-      email: email,
-      password: password,
-      city: city,
-      interests: interests,
-    );
+    try {
+      await _signUp(
+        name: name,
+        email: email,
+        password: password,
+        city: city,
+        interests: interests,
+      );
+    } catch (e) {
+      _setError(e);
+      status = AuthStatus.unauthenticated;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> signOut() async {
@@ -68,5 +83,15 @@ class AuthProvider extends ChangeNotifier {
   void dispose() {
     _sub?.cancel();
     super.dispose();
+  }
+
+  void _setError(Object e) {
+    lastError = e.toString().replaceAll('Exception: ', '');
+    notifyListeners();
+  }
+
+  void clearError() {
+    lastError = null;
+    notifyListeners();
   }
 }
