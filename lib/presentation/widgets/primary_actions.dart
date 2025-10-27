@@ -1,5 +1,6 @@
 import 'package:donation_app/presentation/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PrimaryActions extends StatelessWidget {
   final Future<String?> Function() onNewDonation;
@@ -26,9 +27,17 @@ class PrimaryActions extends StatelessWidget {
               // Nueva Donación
               SizedBox(
                 height: 60,
-                child: PrimaryButton(
-                  label: 'New Donation',
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    textStyle: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    shape: const StadiumBorder(),
+                  ),
                   onPressed: () async => await onNewDonation(),
+                  icon: const Icon(Icons.add),
+                  label: const Text('New Donation'),
                 ),
               ),
               const SizedBox(height: 10),
@@ -41,7 +50,8 @@ class PrimaryActions extends StatelessWidget {
                     shape: const StadiumBorder(),
                     side: BorderSide(color: colorScheme.primary),
                     foregroundColor: colorScheme.primary,
-                    textStyle: const TextStyle(
+                    textStyle: GoogleFonts.montserrat(
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

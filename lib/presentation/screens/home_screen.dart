@@ -187,7 +187,7 @@ class _HubView extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'My latest donation',
+                  'My Latest Donation',
                   style: GoogleFonts.montserrat(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,

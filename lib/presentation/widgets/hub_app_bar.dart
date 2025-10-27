@@ -42,10 +42,9 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
           itemBuilder: (context) => [
             PopupMenuItem<String>(
               value: 'greeting',
-              enabled: false,
               child: Text(
                 'Hello, $name 👋',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(),
               ),
             ),
             const PopupMenuDivider(),
