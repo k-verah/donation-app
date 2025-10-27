@@ -27,9 +27,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
     await context.read<AuthProvider>().signIn(
-      _email.text.trim(),
-      _pass.text.trim(),
-    );
+          _email.text.trim(),
+          _pass.text.trim(),
+        );
   }
 
   @override
@@ -63,6 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF003137),
+                foregroundColor: Colors.white,
+              ),
               onPressed: loading ? null : _login,
               child: loading
                   ? const SizedBox(
