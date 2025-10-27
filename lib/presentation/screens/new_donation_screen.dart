@@ -85,7 +85,6 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
       return;
     }
 
-    // Donación a Firestore vía tu DonationProvider (usa tu use case CreateDonation)
     final donationProv = context.read<DonationProvider>();
     await donationProv.create(
       description: _desc.text.trim(),
@@ -95,7 +94,7 @@ class _NewDonationScreenState extends State<NewDonationScreen> {
       tags: _selectedTags.toList(),
       localImagePath: _image?.path,
     );
-    Navigator.pop(context);
+    Navigator.pop(context, _image?.path);
   }
 
   @override

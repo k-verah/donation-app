@@ -20,7 +20,6 @@ class DonationsRepositoryImpl implements DonationsRepository {
       'brand': input.brand,
       'tags': input.tags,
       'createdAt': FieldValue.serverTimestamp(),
-      'localImagePath': input.localImagePath,
     };
     await _ds.create(map);
   }
