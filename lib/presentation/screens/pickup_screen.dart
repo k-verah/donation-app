@@ -11,6 +11,8 @@ class PickupScreen extends StatefulWidget {
 }
 
 class _PickupScreenState extends State<PickupScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
@@ -31,7 +33,7 @@ class _PickupScreenState extends State<PickupScreen> {
   }
 
   Future<void> _selectDate() async {
-    final pickedDate = await showDatePicker(
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
@@ -45,7 +47,7 @@ class _PickupScreenState extends State<PickupScreen> {
   }
 
   Future<void> _selectTime() async {
-    final pickedTime = await showTimePicker(
+    final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
@@ -56,25 +58,16 @@ class _PickupScreenState extends State<PickupScreen> {
   }
 
   void _confirmPickup() {
-    if (_locationController.text.isEmpty ||
-        _dateController.text.isEmpty ||
-        _timeController.text.isEmpty) {
+    if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill out all fields.")),
+        const SnackBar(content: Text("Pickup confirmed successfully!")),
       );
-      return;
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Pickup confirmed successfully!")),
-    );
-    Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
   }
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF003137);
-    const background = Color(0xFFAFC7CA);
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -82,10 +75,9 @@ class _PickupScreenState extends State<PickupScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context)
-              .pushNamedAndRemoveUntil('/home', (route) => false),
+              .pushNamedAndRemoveUntil('/home', (_) => false),
         ),
       ),
-      backgroundColor: background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -94,93 +86,99 @@ class _PickupScreenState extends State<PickupScreen> {
 
             return SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + kb + safe),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + kb + safe),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 8),
-                    Text(
-                      "Select the details for your pickup",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    TextField(
-                      controller: _locationController,
-                      readOnly: true,
-                      onTap: _fillWithCurrentLocation,
-                      decoration: InputDecoration(
-                        labelText: "Select location",
-                        hintText: "Tap to use current location",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.my_location),
-                          onPressed: _fillWithCurrentLocation,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _dateController,
-                      readOnly: true,
-                      onTap: _selectDate,
-                      decoration: InputDecoration(
-                        labelText: "Select date",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.calendar_today),
-                          onPressed: _selectDate,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _timeController,
-                      readOnly: true,
-                      onTap: _selectTime,
-                      decoration: InputDecoration(
-                        labelText: "Select time",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.access_time),
-                          onPressed: _selectTime,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    ElevatedButton(
-                      onPressed: _confirmPickup,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primary,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 80,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: Text(
-                        "Confirm",
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 10),
+                      Text(
+                        "Select the details for your pickup",
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.montserrat(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _locationController,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        readOnly: true,
+                        onTap: _fillWithCurrentLocation,
+                        decoration: InputDecoration(
+                          labelText: "Select Location (Required)",
+                          hintText: "Tap to use current location",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.my_location),
+                            onPressed: _fillWithCurrentLocation,
+                          ),
+                        ),
+                        validator: (value) => value!.isEmpty
+                            ? "Please select your location"
+                            : null,
+                      ),
+                      const SizedBox(height: 15),
+                      TextFormField(
+                        controller: _dateController,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        readOnly: true,
+                        onTap: _selectDate,
+                        decoration: InputDecoration(
+                          labelText: "PickUp Date (Required)",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.calendar_today),
+                            onPressed: _selectDate,
+                          ),
+                        ),
+                        validator: (value) =>
+                            value!.isEmpty ? "Please pick a pickup date" : null,
+                      ),
+                      const SizedBox(height: 15),
+                      TextFormField(
+                        controller: _timeController,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        readOnly: true,
+                        onTap: _selectTime,
+                        decoration: InputDecoration(
+                          labelText: "PickUp Time (Required)",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.access_time),
+                            onPressed: _selectTime,
+                          ),
+                        ),
+                        validator: (value) =>
+                            value!.isEmpty ? "Please pick a pickup time" : null,
+                      ),
+                      const SizedBox(height: 25),
+                      ElevatedButton(
+                        onPressed: _confirmPickup,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF003137),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        child: Text(
+                          "Confirm PickUp",
+                          style: GoogleFonts.montserrat(
+                              color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

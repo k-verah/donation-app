@@ -40,6 +40,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
   }
 
+  void _confirmSchedule() {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Donation scheduled successfully!")),
+      );
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,33 +74,47 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Form(
                   key: _formKey,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Plan ahead when you want to deliver your items",
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
                         controller: _titleController,
-                        decoration: const InputDecoration(
-                          labelText: "Donation Title (Required)",
-                          border: OutlineInputBorder(),
-                        ),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: InputDecoration(
+                            labelText: "Donation Title (Required)",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            suffixIcon: const Icon(Icons.title)),
                         validator: (value) =>
                             value!.isEmpty ? "Please enter a title" : null,
                       ),
                       const SizedBox(height: 15),
                       TextFormField(
                         controller: _dateController,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                         readOnly: true,
                         onTap: _pickDate,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Donation Date (Required)",
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.calendar_today),
+                            onPressed: _pickDate,
+                          ),
                         ),
                         validator: (value) =>
                             value!.isEmpty ? "Please pick a date" : null,
@@ -101,38 +124,40 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         controller: _timeController,
                         readOnly: true,
                         onTap: _pickTime,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Donation Time (Optional)",
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.access_time),
+                            onPressed: _pickTime,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 15),
                       TextFormField(
                         controller: _notesController,
                         maxLines: 3,
-                        decoration: const InputDecoration(
-                          labelText: "Additional Notes",
-                          border: OutlineInputBorder(),
-                        ),
+                        decoration: InputDecoration(
+                            labelText: "Additional Notes (Optional)",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            suffixIcon: const Icon(Icons.comment_outlined)),
                       ),
                       const SizedBox(height: 25),
                       ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text("Donation scheduled successfully!")),
-                            );
-                          }
-                        },
+                        onPressed: _confirmSchedule,
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF003137),
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           textStyle: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         child: Text("Confirm Schedule",
                             style: GoogleFonts.montserrat(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w600)),
                       ),
                     ],

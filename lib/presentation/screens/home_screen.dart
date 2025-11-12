@@ -60,9 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const ScheduleScreen();
       case 2:
-        return const DashboardScreen();
-      case 3:
         return const PickupScreen();
+      case 3:
+        return const DashboardScreen();
       default:
         return const MapScreen();
     }
@@ -133,14 +133,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: 'Home',
               ),
               NavigationDestination(
-                icon: Icon(Icons.insights_outlined),
-                selectedIcon: Icon(Icons.insights),
-                label: 'Impact',
-              ),
-              NavigationDestination(
                 icon: Icon(Icons.local_shipping_outlined),
                 selectedIcon: Icon(Icons.local_shipping),
                 label: 'PickUp',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.insights_outlined),
+                selectedIcon: Icon(Icons.insights),
+                label: 'Impact',
               ),
             ],
           ),
