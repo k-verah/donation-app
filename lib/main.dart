@@ -3,6 +3,7 @@ import 'package:donation_app/presentation/screens/donations_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'composition_root.dart';
 import 'config/theme/app_theme.dart';
 
@@ -15,6 +16,7 @@ import 'presentation/screens/new_donation_screen.dart';
 import 'presentation/screens/notifications_screen.dart';
 import 'presentation/screens/schedule_screen.dart';
 import 'presentation/screens/pickup_screen.dart';
+import 'presentation/screens/analytics_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,29 +32,43 @@ class Recyclothes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: CompositionRoot.providers(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        navigatorKey: _navKey,
-        scaffoldMessengerKey: messengerKey,
-        title: 'Recyclothes',
-        theme: AppTheme.light(),
-        home: const StartScreen(),
-        routes: {
-          '/start': (_) => const StartScreen(),
-          '/login': (_) => const LoginScreen(),
-          '/register': (_) => const RegisterScreen(),
-          '/home': (_) => const HomeScreen(),
-          '/donations': (_) => const DonationsScreen(),
-          '/new-donation': (_) => const NewDonationScreen(),
-          '/notifications': (_) => const NotificationsScreen(),
-          '/schedule': (_) => const ScheduleScreen(),
-          '/pickup': (_) => const PickupScreen(),
-        },
-        builder: (context, child) =>
-            _AuthRedirector(navKey: _navKey, child: child ?? const SizedBox()),
-      ),
+    return FutureBuilder<List<SingleChildWidget>>(
+      future: CompositionRoot.providers(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+        
+        return MultiProvider(
+          providers: snapshot.data!,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            navigatorKey: _navKey,
+            scaffoldMessengerKey: messengerKey,
+            title: 'Recyclothes',
+            theme: AppTheme.light(),
+            home: const StartScreen(),
+            routes: {
+              '/start': (_) => const StartScreen(),
+              '/login': (_) => const LoginScreen(),
+              '/register': (_) => const RegisterScreen(),
+              '/home': (_) => const HomeScreen(),
+              '/donations': (_) => const DonationsScreen(),
+              '/new-donation': (_) => const NewDonationScreen(),
+              '/notifications': (_) => const NotificationsScreen(),
+              '/schedule': (_) => const ScheduleScreen(),
+              '/pickup': (_) => const PickupScreen(),
+              '/analytics': (_) => const AnalyticsScreen(),
+            },
+            builder: (context, child) =>
+                _AuthRedirector(navKey: _navKey, child: child ?? const SizedBox()),
+          ),
+        );
+      },
     );
   }
 }
@@ -101,3 +117,4 @@ class _AuthRedirectorState extends State<_AuthRedirector> {
     return widget.child;
   }
 }
+
