@@ -19,7 +19,7 @@ import 'data/datasources/local/local_storage_datasource.dart';
 import 'data/repositories/auth/auth_repository_impl.dart';
 import 'data/repositories/sensors/location_repository_impl.dart';
 import 'data/repositories/sensors/camera_repository_impl.dart';
-import 'package:donation_app/data/repositories/donations/donations_respository_impl.dart';
+import 'package:donation_app/data/repositories/donations/donations_repository_impl.dart';
 import 'data/repositories/foundations/foundation_point_repository_impl.dart';
 import 'data/repositories/analytics/analytics_repository_impl.dart';
 import 'data/repositories/local/local_storage_repository_impl.dart';
