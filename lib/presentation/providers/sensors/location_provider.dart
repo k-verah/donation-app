@@ -1,15 +1,15 @@
 import 'package:donation_app/domain/entities/foundations/foundation_point.dart';
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
-import 'package:donation_app/domain/use_cases/get_current_location.dart';
-import 'package:donation_app/domain/use_cases/get_foundations_points.dart';
-import 'package:donation_app/domain/use_cases/recommend_foundation.dart';
-import 'package:donation_app/domain/use_cases/sort_points.dart';
-import 'package:donation_app/domain/use_cases/save_filter_preferences.dart';
-import 'package:donation_app/domain/use_cases/load_filter_preferences.dart';
-import 'package:donation_app/domain/use_cases/save_last_location.dart';
-import 'package:donation_app/domain/use_cases/load_last_location.dart';
-import 'package:donation_app/domain/use_cases/cache_donation_points.dart';
-import 'package:donation_app/domain/use_cases/load_cached_points.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/get_current_location.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/get_foundations_points.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/recommend_foundation.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/sort_points.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/save_filter_preferences.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/load_filter_preferences.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/save_last_location.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/load_last_location.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/cache_donation_points.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/load_cached_points.dart';
 import 'package:flutter/foundation.dart';
 
 class LocationProvider extends ChangeNotifier {
@@ -75,20 +75,20 @@ class LocationProvider extends ChangeNotifier {
         getFoundationsPoints(),
         getCurrentLocation(),
       ]);
-      
+
       _points = results[0] as List<FoundationPoint>;
       _current = results[1] as GeoPoint?;
-      
+
       // Guardar en cache
       if (_points.isNotEmpty) {
         await cacheDonationPoints(_points);
       }
-      
+
       // Guardar última ubicación
       if (_current != null) {
         await saveLastLocation(_current!);
       }
-      
+
       notifyListeners();
     } catch (e) {
       // Si falla la carga, usar cache si está disponible
@@ -121,14 +121,14 @@ class LocationProvider extends ChangeNotifier {
     if (causeVal != null) cause = causeVal;
     if (accessVal != null) access = accessVal;
     if (scheduleVal != null) schedule = scheduleVal;
-    
+
     // Guardar en local storage
     saveFilterPreferences(
       cause: cause,
       access: access,
       schedule: schedule,
     );
-    
+
     notifyListeners();
   }
 

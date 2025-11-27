@@ -35,30 +35,30 @@ import 'domain/repositories/analytics/analytics_repository.dart';
 import 'domain/repositories/local/local_storage_repository.dart';
 
 // Use Cases
-import 'domain/use_cases/get_auth_state.dart';
-import 'domain/use_cases/sign_in.dart';
-import 'domain/use_cases/sign_out.dart';
-import 'domain/use_cases/sign_up.dart';
-import 'domain/use_cases/get_current_location.dart';
-import 'domain/use_cases/get_foundations_points.dart';
-import 'domain/use_cases/sort_points.dart';
-import 'domain/use_cases/recommend_foundation.dart';
-import 'domain/use_cases/create_donation.dart';
-import 'domain/use_cases/stream_user_donations.dart';
-import 'domain/use_cases/start_camera.dart';
-import 'domain/use_cases/take_photo.dart';
-import 'domain/use_cases/stop_camera.dart';
-import 'domain/use_cases/pick_from_gallery.dart';
-import 'domain/use_cases/track_filter_usage.dart';
-import 'domain/use_cases/track_point_usage.dart';
-import 'domain/use_cases/get_filter_combination_stats.dart';
-import 'domain/use_cases/get_point_usage_stats.dart';
-import 'domain/use_cases/save_filter_preferences.dart';
-import 'domain/use_cases/load_filter_preferences.dart';
-import 'domain/use_cases/save_last_location.dart';
-import 'domain/use_cases/load_last_location.dart';
-import 'domain/use_cases/cache_donation_points.dart';
-import 'domain/use_cases/load_cached_points.dart';
+import 'domain/use_cases/auth/get_auth_state.dart';
+import 'domain/use_cases/auth/sign_in.dart';
+import 'domain/use_cases/auth/sign_out.dart';
+import 'domain/use_cases/auth/sign_up.dart';
+import 'domain/use_cases/sensors/location/get_current_location.dart';
+import 'domain/use_cases/sensors/location/get_foundations_points.dart';
+import 'domain/use_cases/sensors/location/sort_points.dart';
+import 'domain/use_cases/sensors/location/recommend_foundation.dart';
+import 'domain/use_cases/donations/create_donation.dart';
+import 'domain/use_cases/sensors/location/stream_user_donations.dart';
+import 'domain/use_cases/sensors/camera/start_camera.dart';
+import 'domain/use_cases/sensors/camera/take_photo.dart';
+import 'domain/use_cases/sensors/camera/stop_camera.dart';
+import 'domain/use_cases/sensors/camera/pick_from_gallery.dart';
+import 'domain/use_cases/sensors/location/track_filter_usage.dart';
+import 'domain/use_cases/sensors/location/track_point_usage.dart';
+import 'domain/use_cases/sensors/location/get_filter_combination_stats.dart';
+import 'domain/use_cases/sensors/location/get_point_usage_stats.dart';
+import 'domain/use_cases/sensors/location/save_filter_preferences.dart';
+import 'domain/use_cases/sensors/location/load_filter_preferences.dart';
+import 'domain/use_cases/sensors/location/save_last_location.dart';
+import 'domain/use_cases/sensors/location/load_last_location.dart';
+import 'domain/use_cases/sensors/location/cache_donation_points.dart';
+import 'domain/use_cases/sensors/location/load_cached_points.dart';
 
 // PRESENTATION
 // Providers
@@ -107,7 +107,8 @@ class CompositionRoot {
 
     // Analytics
     final analyticsDS = AnalyticsDataSource(FirebaseFirestore.instance);
-    final AnalyticsRepository analyticsRepo = AnalyticsRepositoryImpl(analyticsDS);
+    final AnalyticsRepository analyticsRepo =
+        AnalyticsRepositoryImpl(analyticsDS);
     final trackFilterUsage = TrackFilterUsage(analyticsRepo);
     final trackPointUsage = TrackPointUsage(analyticsRepo);
     final getFilterCombinationStats = GetFilterCombinationStats(analyticsRepo);
@@ -116,7 +117,8 @@ class CompositionRoot {
     // ✅ Local Storage
     final prefs = await SharedPreferences.getInstance();
     final localStorageDS = LocalStorageDataSource(prefs);
-    final LocalStorageRepository localStorageRepo = LocalStorageRepositoryImpl(localStorageDS);
+    final LocalStorageRepository localStorageRepo =
+        LocalStorageRepositoryImpl(localStorageDS);
     final saveFilterPreferences = SaveFilterPreferences(localStorageRepo);
     final loadFilterPreferences = LoadFilterPreferences(localStorageRepo);
     final saveLastLocation = SaveLastLocation(localStorageRepo);

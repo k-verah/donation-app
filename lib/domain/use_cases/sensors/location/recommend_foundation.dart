@@ -1,6 +1,6 @@
 import 'package:donation_app/domain/entities/foundations/foundation_point.dart';
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
-import 'package:donation_app/domain/use_cases/sort_points.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/sort_points.dart';
 
 class RecommendFoundation {
   final SortPoints sorter;

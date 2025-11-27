@@ -5,7 +5,7 @@ class AnalyticsRemoteDatasource {
   AnalyticsRemoteDatasource(this.db);
 
   DocumentReference<Map<String, dynamic>> globalDoc() =>
-      db.collection('analytics').doc('global');
+      db.collection('analyticsdonationpickup').doc('global');
 
   Map<String, dynamic> incSchedule() =>
       {'schedule_confirm_count': FieldValue.increment(1)};

@@ -1,9 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:donation_app/domain/repositories/sensors/camera_repository.dart';
-import 'package:donation_app/domain/use_cases/pick_from_gallery.dart';
-import 'package:donation_app/domain/use_cases/start_camera.dart';
-import 'package:donation_app/domain/use_cases/stop_camera.dart';
-import 'package:donation_app/domain/use_cases/take_photo.dart';
+import 'package:donation_app/domain/use_cases/sensors/camera/pick_from_gallery.dart';
+import 'package:donation_app/domain/use_cases/sensors/camera/start_camera.dart';
+import 'package:donation_app/domain/use_cases/sensors/camera/stop_camera.dart';
+import 'package:donation_app/domain/use_cases/sensors/camera/take_photo.dart';
 import 'package:flutter/material.dart';
 
 class CameraProvider extends ChangeNotifier {

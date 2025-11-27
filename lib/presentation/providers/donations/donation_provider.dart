@@ -1,7 +1,7 @@
 import 'package:donation_app/domain/entities/donations/donation.dart';
 import 'package:donation_app/domain/repositories/donations/donations_repository.dart';
-import 'package:donation_app/domain/use_cases/create_donation.dart';
-import 'package:donation_app/domain/use_cases/stream_user_donations.dart';
+import 'package:donation_app/domain/use_cases/donations/create_donation.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/stream_user_donations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:donation_app/domain/entities/auth/auth_user.dart';
-import 'package:donation_app/domain/use_cases/get_auth_state.dart';
-import 'package:donation_app/domain/use_cases/sign_in.dart';
-import 'package:donation_app/domain/use_cases/sign_out.dart';
-import 'package:donation_app/domain/use_cases/sign_up.dart';
+import 'package:donation_app/domain/use_cases/auth/get_auth_state.dart';
+import 'package:donation_app/domain/use_cases/auth/sign_in.dart';
+import 'package:donation_app/domain/use_cases/auth/sign_out.dart';
+import 'package:donation_app/domain/use_cases/auth/sign_up.dart';
 import 'package:flutter/foundation.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated, loading }

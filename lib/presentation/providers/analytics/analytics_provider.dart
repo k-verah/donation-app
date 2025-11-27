@@ -1,9 +1,9 @@
 import 'package:donation_app/domain/entities/analytics/filter_combination_stats.dart';
 import 'package:donation_app/domain/entities/analytics/point_stats.dart';
-import 'package:donation_app/domain/use_cases/get_filter_combination_stats.dart';
-import 'package:donation_app/domain/use_cases/get_point_usage_stats.dart';
-import 'package:donation_app/domain/use_cases/track_filter_usage.dart';
-import 'package:donation_app/domain/use_cases/track_point_usage.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/get_filter_combination_stats.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/get_point_usage_stats.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/track_filter_usage.dart';
+import 'package:donation_app/domain/use_cases/sensors/location/track_point_usage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
@@ -71,7 +71,7 @@ class AnalyticsProvider extends ChangeNotifier {
         _getFilterCombinationStats.call(),
         _getPointUsageStats.call(),
       ]);
-      
+
       _filterStats = results[0] as List<FilterCombinationStats>;
       _pointStats = results[1] as List<PointStats>;
     } catch (e) {
