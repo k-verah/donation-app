@@ -6,7 +6,7 @@ class ScheduleDonationDatasource {
   ScheduleDonationDatasource(this.db);
 
   DocumentReference<Map<String, dynamic>> newDoc(String id) =>
-      db.collection('donations').doc(id);
+      db.collection('schedule_donations').doc(id);
 
   Map<String, dynamic> toMap(ScheduleDonation d) => {
         'uid': d.uid,
