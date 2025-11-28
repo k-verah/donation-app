@@ -121,7 +121,8 @@ class _PickupScreenState extends State<PickupDonationScreen> {
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error)),
+        SnackBar(
+            content: Text('You already have a donation scheduled for today.')),
       );
     }
   }

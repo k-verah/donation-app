@@ -30,7 +30,8 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
             (data['pickupId'] ?? '') != '';
         if (hasSchedule || hasPickup) {
           throw FirebaseException(
-              plugin: 'firestore', message: 'Already booked for this day.');
+              plugin: 'firestore',
+              message: 'You already have a donation scheduled for today.');
         }
       }
 
