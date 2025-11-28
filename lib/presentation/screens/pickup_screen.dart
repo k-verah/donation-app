@@ -1,3 +1,5 @@
+import 'package:donation_app/domain/entities/sensors/geo_point.dart';
+import 'package:donation_app/presentation/providers/donations/pickup_donation_provider.dart';
 import 'package:donation_app/presentation/providers/sensors/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,6 +19,18 @@ class _PickupScreenState extends State<PickupScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
 
+  GeoPoint? _selectedLocation;
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+
+  @override
+  void dispose() {
+    _locationController.dispose();
+    _dateController.dispose();
+    _timeController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fillWithCurrentLocation() async {
     final locProv = context.read<LocationProvider>();
     final point = await locProv.getCurrentLocation();
@@ -27,19 +41,22 @@ class _PickupScreenState extends State<PickupScreen> {
       );
       return;
     }
+    _selectedLocation = point;
     _locationController.text =
         "Lat: ${point.lat.toStringAsFixed(4)}, Lng: ${point.lng.toStringAsFixed(4)}";
     setState(() {});
   }
 
   Future<void> _selectDate() async {
+    final now = DateTime.now();
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: _selectedDate ?? now,
+      firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
+      _selectedDate = pickedDate;
       _dateController.text =
           "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
       setState(() {});
@@ -49,20 +66,63 @@ class _PickupScreenState extends State<PickupScreen> {
   Future<void> _selectTime() async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _selectedTime ?? TimeOfDay.now(),
     );
     if (pickedTime != null) {
+      _selectedTime = pickedTime;
       _timeController.text = pickedTime.format(context);
       setState(() {});
     }
   }
 
-  void _confirmPickup() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _confirmPickup() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedLocation == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select your location.")),
+      );
+      return;
+    }
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please pick a pickup date.")),
+      );
+      return;
+    }
+    if (_selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please pick a pickup time.")),
+      );
+      return;
+    }
+
+    final pickupDateTime = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
+
+    final provider = context.read<PickupProvider>();
+    final error = await provider.onConfirm(
+      location: _selectedLocation!,
+      date: pickupDateTime,
+      time: _timeController.text,
+    );
+
+    if (!mounted) return;
+
+    if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Pickup confirmed successfully!")),
       );
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
     }
   }
 

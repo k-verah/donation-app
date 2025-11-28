@@ -1,5 +1,7 @@
+import 'package:donation_app/presentation/providers/donations/schedule_donation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -16,14 +18,28 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
 
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _dateController.dispose();
+    _timeController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
   Future<void> _pickDate() async {
+    final now = DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: _selectedDate ?? now,
+      firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(2100),
     );
     if (picked != null) {
+      _selectedDate = picked;
       _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
       setState(() {});
     }
@@ -32,20 +48,52 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Future<void> _pickTime() async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: _selectedTime ?? TimeOfDay.now(),
     );
     if (picked != null) {
+      _selectedTime = picked;
       _timeController.text = picked.format(context);
       setState(() {});
     }
   }
 
-  void _confirmSchedule() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _confirmSchedule() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please pick a donation date.")),
+      );
+      return;
+    }
+
+    DateTime finalDate = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+    );
+
+    final provider = context.read<ScheduleProvider>();
+    final error = await provider.onConfirm(
+      title: _titleController.text.trim(),
+      date: finalDate,
+      time: _selectedTime != null ? _timeController.text : null,
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Donation scheduled successfully!")),
       );
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('You already have a donation scheduled for today.')),
+      );
     }
   }
 
