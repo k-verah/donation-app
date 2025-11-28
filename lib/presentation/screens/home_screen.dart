@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:donation_app/domain/entities/donations/donation.dart';
 import 'package:donation_app/presentation/providers/donations/donation_provider.dart';
+import 'package:donation_app/presentation/screens/dashboard_screen.dart';
+import 'package:donation_app/presentation/screens/map_screen.dart';
+import 'package:donation_app/presentation/screens/pickup_donation_screen.dart';
+import 'package:donation_app/presentation/screens/schedule_donation_screen.dart';
 import 'package:donation_app/presentation/widgets/banner_carousel.dart';
 import 'package:donation_app/presentation/widgets/hub_app_bar.dart';
 import 'package:donation_app/presentation/widgets/last_donation.dart';
@@ -8,11 +12,6 @@ import 'package:donation_app/presentation/widgets/primary_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
-import 'map_screen.dart';
-import 'dashboard_screen.dart';
-import 'schedule_screen.dart';
-import 'pickup_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -58,9 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return const MapScreen();
       case 1:
-        return const ScheduleScreen();
+        return const ScheduleDonationScreen();
       case 2:
-        return const PickupScreen();
+        return const PickupDonationScreen();
       case 3:
         return const DashboardScreen();
       default:

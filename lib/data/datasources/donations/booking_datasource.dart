@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-class BookingRemoteDatasource {
+class BookingDatasource {
   final FirebaseFirestore db;
-  BookingRemoteDatasource(this.db);
+  BookingDatasource(this.db);
 
   String dayKey(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
   String bookingDocId(String uid, DateTime d) => '${uid}_${dayKey(d)}';

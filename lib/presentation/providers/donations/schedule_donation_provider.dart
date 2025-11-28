@@ -1,12 +1,12 @@
 import 'package:donation_app/domain/entities/donations/schedule_donation.dart';
-import 'package:donation_app/domain/use_cases/donations/confirm_schedule.dart';
+import 'package:donation_app/domain/use_cases/donations/confirm_schedule_donation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
-class ScheduleProvider extends ChangeNotifier {
-  final ConfirmSchedule confirmSchedule;
-  ScheduleProvider(this.confirmSchedule);
+class ScheduleDonationProvider extends ChangeNotifier {
+  final ConfirmScheduleDonation confirmSchedule;
+  ScheduleDonationProvider(this.confirmSchedule);
 
   Future<String?> onConfirm({
     required String title,

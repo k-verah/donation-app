@@ -1,14 +1,12 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:io';
+import 'package:donation_app/presentation/providers/donations/donation_provider.dart';
 import 'package:donation_app/presentation/providers/sensors/camera_provider.dart';
 import 'package:donation_app/presentation/screens/camara_sensor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/donations/donation_provider.dart';
-import '../widgets/app_scaffold.dart'; // si tienes un scaffold común, opcional
 
 class NewDonationScreen extends StatefulWidget {
   const NewDonationScreen({super.key});

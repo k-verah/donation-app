@@ -1,13 +1,13 @@
 import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
-import 'package:donation_app/domain/use_cases/donations/confirm_pickup.dart';
+import 'package:donation_app/domain/use_cases/donations/confirm_pickup_donation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
-class PickupProvider extends ChangeNotifier {
-  final ConfirmPickup confirmPickup;
-  PickupProvider(this.confirmPickup);
+class PickupDonationProvider extends ChangeNotifier {
+  final ConfirmPickupDonation confirmPickup;
+  PickupDonationProvider(this.confirmPickup);
 
   Future<String?> onConfirm({
     required GeoPoint location,

@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation_app/data/datasources/analytics/analytics_donation_pickup_datasource.dart';
-import 'package:donation_app/data/datasources/donations/booking_remote_datasource.dart';
-import 'package:donation_app/data/datasources/donations/pickup_remote_datasource.dart';
+import 'package:donation_app/data/datasources/donations/booking_datasource.dart';
+import 'package:donation_app/data/datasources/donations/pickup_donation_datasource.dart';
 import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
 import 'package:donation_app/domain/repositories/donations/pickup_donation_repository.dart';
 
-class PickupRepositoryImpl implements PickupDonationRepository {
+class PickupDonationRepositoryImpl implements PickupDonationRepository {
   final FirebaseFirestore db;
-  final BookingRemoteDatasource bookingDS;
-  final PickupRemoteDatasource pickupDS;
+  final BookingDatasource bookingDS;
+  final PickupDonationDatasource pickupDS;
   final AnalyticsRemoteDatasource analyticsDS;
 
-  PickupRepositoryImpl(
+  PickupDonationRepositoryImpl(
       this.db, this.bookingDS, this.pickupDS, this.analyticsDS);
 
   @override

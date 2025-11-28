@@ -1,10 +1,9 @@
-import 'package:donation_app/main.dart';
+import 'package:donation_app/presentation/providers/auth/auth_provider.dart';
+import 'package:donation_app/presentation/widgets/app_scaffold.dart';
+import 'package:donation_app/presentation/widgets/app_text_field.dart';
+import 'package:donation_app/presentation/widgets/password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth/auth_provider.dart';
-import '../widgets/app_scaffold.dart';
-import '../widgets/password_field.dart';
-import '../widgets/app_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

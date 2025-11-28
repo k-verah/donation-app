@@ -14,8 +14,8 @@ import 'presentation/screens/register_screen.dart';
 import 'presentation/screens/home_screen.dart';
 import 'presentation/screens/new_donation_screen.dart';
 import 'presentation/screens/notifications_screen.dart';
-import 'presentation/screens/schedule_screen.dart';
-import 'presentation/screens/pickup_screen.dart';
+import 'presentation/screens/schedule_donation_screen.dart';
+import 'presentation/screens/pickup_donation_screen.dart';
 import 'presentation/screens/analytics_screen.dart';
 
 Future<void> main() async {
@@ -42,7 +42,7 @@ class Recyclothes extends StatelessWidget {
             ),
           );
         }
-        
+
         return MultiProvider(
           providers: snapshot.data!,
           child: MaterialApp(
@@ -60,12 +60,12 @@ class Recyclothes extends StatelessWidget {
               '/donations': (_) => const DonationsScreen(),
               '/new-donation': (_) => const NewDonationScreen(),
               '/notifications': (_) => const NotificationsScreen(),
-              '/schedule': (_) => const ScheduleScreen(),
-              '/pickup': (_) => const PickupScreen(),
+              '/schedule': (_) => const ScheduleDonationScreen(),
+              '/pickup': (_) => const PickupDonationScreen(),
               '/analytics': (_) => const AnalyticsScreen(),
             },
-            builder: (context, child) =>
-                _AuthRedirector(navKey: _navKey, child: child ?? const SizedBox()),
+            builder: (context, child) => _AuthRedirector(
+                navKey: _navKey, child: child ?? const SizedBox()),
           ),
         );
       },
@@ -117,4 +117,3 @@ class _AuthRedirectorState extends State<_AuthRedirector> {
     return widget.child;
   }
 }
-

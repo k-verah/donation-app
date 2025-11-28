@@ -1,5 +1,5 @@
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
-import '../../../repositories/sensors/location_repository.dart';
+import 'package:donation_app/domain/repositories/sensors/location_repository.dart';
 
 class GetCurrentLocation {
   final LocationRepository repo;

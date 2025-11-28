@@ -1,5 +1,5 @@
+import 'package:donation_app/presentation/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
-import '../widgets/app_scaffold.dart';
 
 class StartScreen extends StatelessWidget {
   const StartScreen({super.key});

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation_app/domain/entities/donations/schedule_donation.dart';
 
-class DonationRemoteDatasource {
+class ScheduleDonationDatasource {
   final FirebaseFirestore db;
-  DonationRemoteDatasource(this.db);
+  ScheduleDonationDatasource(this.db);
 
   DocumentReference<Map<String, dynamic>> newDoc(String id) =>
       db.collection('donations').doc(id);

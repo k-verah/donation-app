@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
+import 'package:donation_app/presentation/providers/sensors/camera_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/sensors/camera_provider.dart';
 
 class CameraSensorScreen extends StatefulWidget {
   const CameraSensorScreen({super.key});

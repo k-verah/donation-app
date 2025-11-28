@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
 
-class PickupRemoteDatasource {
+class PickupDonationDatasource {
   final FirebaseFirestore db;
-  PickupRemoteDatasource(this.db);
+  PickupDonationDatasource(this.db);
 
   DocumentReference<Map<String, dynamic>> newDoc(String id) =>
       db.collection('pickups').doc(id);
