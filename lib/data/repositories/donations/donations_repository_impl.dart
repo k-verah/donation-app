@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation_app/data/datasources/donations/donations_datasource.dart';
 import 'package:donation_app/domain/entities/donations/donation.dart';
+import 'package:donation_app/domain/entities/donations/donation_completion_status.dart';
 import 'package:donation_app/domain/repositories/donations/donations_repository.dart';
 
 class DonationsRepositoryImpl implements DonationsRepository {
@@ -20,6 +21,7 @@ class DonationsRepositoryImpl implements DonationsRepository {
       'brand': input.brand,
       'tags': input.tags,
       'createdAt': FieldValue.serverTimestamp(),
+      'completionStatus': DonationCompletionStatus.available.toJson(),
     };
     await _ds.create(map);
   }
@@ -41,8 +43,28 @@ class DonationsRepositoryImpl implements DonationsRepository {
           tags: List<String>.from(m['tags'] ?? const []),
           createdAt: createdAt,
           localImagePath: m['localImagePath'],
+          // Leer completionStatus de Firebase (con fallback a 'available')
+          completionStatus: DonationCompletionStatusExtension.fromJson(
+            m['completionStatus'] as String?,
+          ),
         );
       }).toList();
     });
+  }
+
+  @override
+  Future<void> updateCompletionStatus(
+    String donationId,
+    DonationCompletionStatus status,
+  ) async {
+    await _ds.updateCompletionStatus(donationId, status);
+  }
+
+  @override
+  Future<void> updateMultipleCompletionStatus(
+    List<String> donationIds,
+    DonationCompletionStatus status,
+  ) async {
+    await _ds.updateMultipleCompletionStatus(donationIds, status);
   }
 }

@@ -1,6 +1,9 @@
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
+import 'package:donation_app/presentation/providers/donations/donation_provider.dart';
 import 'package:donation_app/presentation/providers/donations/pickup_donation_provider.dart';
 import 'package:donation_app/presentation/providers/sensors/location_provider.dart';
+import 'package:donation_app/presentation/widgets/donation_selection_list.dart';
+import 'package:donation_app/presentation/widgets/sync_status_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +25,15 @@ class _PickupScreenState extends State<PickupDonationScreen> {
   GeoPoint? _selectedLocation;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
+
+  @override
+  void initState() {
+    super.initState();
+    // Limpiar selección anterior
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PickupDonationProvider>().clearSelection();
+    });
+  }
 
   @override
   void dispose() {
@@ -76,6 +88,15 @@ class _PickupScreenState extends State<PickupDonationScreen> {
   }
 
   Future<void> _confirmPickup() async {
+    final pickupProvider = context.read<PickupDonationProvider>();
+
+    if (pickupProvider.selectedDonationIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select at least one donation.")),
+      );
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedLocation == null) {
@@ -105,8 +126,7 @@ class _PickupScreenState extends State<PickupDonationScreen> {
       _selectedTime!.minute,
     );
 
-    final provider = context.read<PickupDonationProvider>();
-    final error = await provider.onConfirm(
+    final error = await pickupProvider.onConfirm(
       location: _selectedLocation!,
       date: pickupDateTime,
       time: _timeController.text,
@@ -116,19 +136,26 @@ class _PickupScreenState extends State<PickupDonationScreen> {
 
     if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Pickup confirmed successfully!")),
+        const SnackBar(
+          content: Text("Pickup scheduled! Will sync when online."),
+          backgroundColor: Color(0xFF003137),
+        ),
       );
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('You already have a donation scheduled for today.')),
+        SnackBar(content: Text(error)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final donationProvider = context.watch<DonationProvider>();
+    final pickupProvider = context.watch<PickupDonationProvider>();
+    // Solo mostrar donaciones disponibles (no asociadas a ningún schedule/pickup)
+    final donations = donationProvider.availableDonations;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -139,112 +166,168 @@ class _PickupScreenState extends State<PickupDonationScreen> {
               .pushNamedAndRemoveUntil('/home', (_) => false),
         ),
       ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final kb = MediaQuery.of(context).viewInsets.bottom;
-            final safe = MediaQuery.of(context).padding.bottom;
+      body: Column(
+        children: [
+          // Banner de estado de sync
+          const SyncStatusBanner(),
 
-            return SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + kb + safe),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 10),
-                      Text(
-                        "Select the details for your pickup",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+          Expanded(
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final kb = MediaQuery.of(context).viewInsets.bottom;
+                  final safe = MediaQuery.of(context).padding.bottom;
+
+                  return SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + kb + safe),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            "Select items for home pickup",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Lista de donaciones seleccionables
+                          DonationSelectionList(
+                            donations: donations,
+                            selectedIds: pickupProvider.selectedDonationIds,
+                            onToggle: pickupProvider.toggleDonation,
+                            emptyMessage: 'No donations for pickup',
+                          ),
+
+                          const SizedBox(height: 24),
+                          Divider(color: Colors.grey.shade300),
+                          const SizedBox(height: 16),
+
+                          Text(
+                            "Pickup Details",
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          TextFormField(
+                            controller: _locationController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            readOnly: true,
+                            onTap: _fillWithCurrentLocation,
+                            decoration: InputDecoration(
+                              labelText: "Select Location (Required)",
+                              hintText: "Tap to use current location",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.my_location),
+                                onPressed: _fillWithCurrentLocation,
+                              ),
+                            ),
+                            validator: (value) => value!.isEmpty
+                                ? "Please select your location"
+                                : null,
+                          ),
+                          const SizedBox(height: 15),
+                          TextFormField(
+                            controller: _dateController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            readOnly: true,
+                            onTap: _selectDate,
+                            decoration: InputDecoration(
+                              labelText: "PickUp Date (Required)",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.calendar_today),
+                                onPressed: _selectDate,
+                              ),
+                            ),
+                            validator: (value) => value!.isEmpty
+                                ? "Please pick a pickup date"
+                                : null,
+                          ),
+                          const SizedBox(height: 15),
+                          TextFormField(
+                            controller: _timeController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            readOnly: true,
+                            onTap: _selectTime,
+                            decoration: InputDecoration(
+                              labelText: "PickUp Time (Required)",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.access_time),
+                                onPressed: _selectTime,
+                              ),
+                            ),
+                            validator: (value) => value!.isEmpty
+                                ? "Please pick a pickup time"
+                                : null,
+                          ),
+                          const SizedBox(height: 25),
+
+                          // Botón de confirmar
+                          ElevatedButton(
+                            onPressed:
+                                pickupProvider.selectedDonationIds.isNotEmpty
+                                    ? _confirmPickup
+                                    : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF003137),
+                              disabledBackgroundColor: Colors.grey.shade300,
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              textStyle: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            child: Text(
+                              "Confirm PickUp (${pickupProvider.selectedDonationIds.length} items)",
+                              style: GoogleFonts.montserrat(
+                                color: pickupProvider
+                                        .selectedDonationIds.isNotEmpty
+                                    ? Colors.white
+                                    : Colors.grey.shade500,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+                          Text(
+                            "⚡ Works offline! Will sync when connected.",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _locationController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        readOnly: true,
-                        onTap: _fillWithCurrentLocation,
-                        decoration: InputDecoration(
-                          labelText: "Select Location (Required)",
-                          hintText: "Tap to use current location",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.my_location),
-                            onPressed: _fillWithCurrentLocation,
-                          ),
-                        ),
-                        validator: (value) => value!.isEmpty
-                            ? "Please select your location"
-                            : null,
-                      ),
-                      const SizedBox(height: 15),
-                      TextFormField(
-                        controller: _dateController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        readOnly: true,
-                        onTap: _selectDate,
-                        decoration: InputDecoration(
-                          labelText: "PickUp Date (Required)",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: _selectDate,
-                          ),
-                        ),
-                        validator: (value) =>
-                            value!.isEmpty ? "Please pick a pickup date" : null,
-                      ),
-                      const SizedBox(height: 15),
-                      TextFormField(
-                        controller: _timeController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        readOnly: true,
-                        onTap: _selectTime,
-                        decoration: InputDecoration(
-                          labelText: "PickUp Time (Required)",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.access_time),
-                            onPressed: _selectTime,
-                          ),
-                        ),
-                        validator: (value) =>
-                            value!.isEmpty ? "Please pick a pickup time" : null,
-                      ),
-                      const SizedBox(height: 25),
-                      ElevatedButton(
-                        onPressed: _confirmPickup,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF003137),
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          textStyle: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        child: Text(
-                          "Confirm PickUp",
-                          style: GoogleFonts.montserrat(
-                              color: Colors.white, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

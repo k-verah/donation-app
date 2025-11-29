@@ -27,6 +27,9 @@ import 'data/datasources/analytics/analytics_datasource.dart';
 import 'data/datasources/analytics/analytics_donation_pickup_datasource.dart';
 // Local
 import 'data/datasources/local/local_storage_datasource.dart';
+// Services
+import 'data/services/sync/connectivity_service.dart';
+import 'data/services/sync/sync_service.dart';
 
 // REPOSITORIES
 
@@ -112,6 +115,8 @@ import 'presentation/providers/donations/schedule_donation_provider.dart';
 import 'presentation/providers/donations/pickup_donation_provider.dart';
 // Analytics
 import 'presentation/providers/analytics/analytics_provider.dart';
+// Sync
+import 'presentation/providers/sync/sync_provider.dart';
 
 class CompositionRoot {
   static Future<List<SingleChildWidget>> providers() async {
@@ -143,6 +148,16 @@ class CompositionRoot {
     final createDonation = CreateDonation(donationsRepo);
     final streamUserDonations = StreamUserDonations(donationsRepo);
 
+    // ✅ Local Storage (movido arriba porque se necesita antes)
+    final prefs = await SharedPreferences.getInstance();
+    final localStorageDS = LocalStorageDataSource(prefs);
+    final LocalStorageRepository localStorageRepo =
+        LocalStorageRepositoryImpl(localStorageDS);
+
+    // ✅ Connectivity & Sync Services
+    final connectivityService = ConnectivityService();
+    await connectivityService.init();
+
     final bookingDS = BookingDatasource(FirebaseFirestore.instance);
     final donationPickupAnalyticsDS =
         AnalyticsRemoteDatasource(FirebaseFirestore.instance);
@@ -150,17 +165,44 @@ class CompositionRoot {
     final scheduleDonationDS =
         ScheduleDonationDatasource(FirebaseFirestore.instance);
     final ScheduleDonationRepository scheduleDonationRepo =
-        ScheduleDonationRepositoryImpl(FirebaseFirestore.instance, bookingDS,
-            scheduleDonationDS, donationPickupAnalyticsDS);
+        ScheduleDonationRepositoryImpl(
+      FirebaseFirestore.instance,
+      bookingDS,
+      scheduleDonationDS,
+      donationPickupAnalyticsDS,
+      localStorage: localStorageRepo,
+      connectivity: connectivityService,
+      donationsDS: donationsDS,
+    );
+
     final pickupDonationDS =
         PickupDonationDatasource(FirebaseFirestore.instance);
     final PickupDonationRepository pickupDonationRepo =
-        PickupDonationRepositoryImpl(FirebaseFirestore.instance, bookingDS,
-            pickupDonationDS, donationPickupAnalyticsDS);
+        PickupDonationRepositoryImpl(
+      FirebaseFirestore.instance,
+      bookingDS,
+      pickupDonationDS,
+      donationPickupAnalyticsDS,
+      localStorage: localStorageRepo,
+      connectivity: connectivityService,
+      donationsDS: donationsDS,
+    );
 
     final confirmScheduleDonation =
         ConfirmScheduleDonation(scheduleDonationRepo);
     final confirmPickupDonation = ConfirmPickupDonation(pickupDonationRepo);
+
+    // ✅ Sync Service
+    final syncService = SyncService(
+      connectivity: connectivityService,
+      localStorage: localStorageRepo,
+      firestore: FirebaseFirestore.instance,
+      donationsDS: donationsDS,
+      scheduleDS: scheduleDonationDS,
+      pickupDS: pickupDonationDS,
+      bookingDS: bookingDS,
+    );
+    syncService.init();
 
     final camDS = CameraDatasource();
     final CameraRepository camRepo = CameraRepositoryImpl(camDS);
@@ -178,11 +220,7 @@ class CompositionRoot {
     final getFilterCombinationStats = GetFilterCombinationStats(analyticsRepo);
     final getPointUsageStats = GetPointUsageStats(analyticsRepo);
 
-    // ✅ Local Storage
-    final prefs = await SharedPreferences.getInstance();
-    final localStorageDS = LocalStorageDataSource(prefs);
-    final LocalStorageRepository localStorageRepo =
-        LocalStorageRepositoryImpl(localStorageDS);
+    // Local Storage Use Cases
     final saveFilterPreferences = SaveFilterPreferences(localStorageRepo);
     final loadFilterPreferences = LoadFilterPreferences(localStorageRepo);
     final saveLastLocation = SaveLastLocation(localStorageRepo);
@@ -217,6 +255,9 @@ class CompositionRoot {
         create: (_) => DonationProvider(
           createDonation: createDonation,
           streamUserDonations: streamUserDonations,
+          localStorage: localStorageRepo,
+          donationsRepo: donationsRepo,
+          connectivity: connectivityService,
         ),
       ),
       ChangeNotifierProvider(
@@ -244,6 +285,12 @@ class CompositionRoot {
       ChangeNotifierProvider(
         create: (_) => PickupDonationProvider(
           confirmPickupDonation,
+        ),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => SyncProvider(
+          connectivity: connectivityService,
+          syncService: syncService,
         ),
       ),
     ];

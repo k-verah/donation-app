@@ -13,6 +13,10 @@ class PickupDonationDatasource {
         'location': GeoPoint(p.location.lat, p.location.lng),
         'date': Timestamp.fromDate(p.date),
         'time': p.time,
+        'donationIds': p.donationIds,
         'createdAt': FieldValue.serverTimestamp(),
+        'isDelivered': p.isDelivered,
+        'deliveredAt':
+            p.deliveredAt != null ? Timestamp.fromDate(p.deliveredAt!) : null,
       };
 }

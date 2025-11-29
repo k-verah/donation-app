@@ -1,12 +1,22 @@
 import 'package:donation_app/data/datasources/local/local_storage_datasource.dart';
 import 'package:donation_app/domain/entities/foundations/foundation_point.dart';
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
+import 'package:donation_app/domain/entities/donations/donation.dart';
+import 'package:donation_app/domain/entities/donations/donation_completion_status.dart';
+import 'package:donation_app/domain/entities/donations/schedule_donation.dart';
+import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
+import 'package:donation_app/domain/entities/sync/sync_status.dart';
+import 'package:donation_app/domain/entities/sync/sync_queue_item.dart';
 import 'package:donation_app/domain/repositories/local/local_storage_repository.dart';
 
 class LocalStorageRepositoryImpl implements LocalStorageRepository {
   final LocalStorageDataSource dataSource;
 
   LocalStorageRepositoryImpl(this.dataSource);
+
+  // ============================================================
+  // Filtros y ubicación (existentes)
+  // ============================================================
 
   @override
   Future<void> saveFilterPreferences({
@@ -54,5 +64,215 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
   @override
   Future<void> clearCache() async {
     await dataSource.clearCache();
+  }
+
+  // ============================================================
+  // Donations
+  // ============================================================
+
+  @override
+  Future<void> saveDonation(Donation donation) async {
+    await dataSource.saveDonation(donation);
+  }
+
+  @override
+  Future<void> saveDonations(List<Donation> donations) async {
+    await dataSource.saveDonations(donations);
+  }
+
+  @override
+  List<Donation> getDonations() {
+    return dataSource.getDonations();
+  }
+
+  @override
+  List<Donation> getDonationsByUid(String uid) {
+    return dataSource.getDonationsByUid(uid);
+  }
+
+  @override
+  List<Donation> getPendingDonations() {
+    return dataSource.getPendingDonations();
+  }
+
+  @override
+  Future<void> updateDonationSyncStatus(String id, SyncStatus status) async {
+    await dataSource.updateDonationSyncStatus(id, status);
+  }
+
+  @override
+  bool isDonationsCacheValid() {
+    return dataSource.isDonationsCacheValid();
+  }
+
+  // ============================================================
+  // Donations - Completion Status
+  // ============================================================
+
+  @override
+  List<Donation> getAvailableDonations(String uid) {
+    return dataSource.getAvailableDonations(uid);
+  }
+
+  @override
+  List<Donation> getPendingCompletionDonations(String uid) {
+    return dataSource.getPendingCompletionDonations(uid);
+  }
+
+  @override
+  List<Donation> getCompletedDonations(String uid) {
+    return dataSource.getCompletedDonations(uid);
+  }
+
+  @override
+  Future<void> updateDonationCompletionStatus(
+    String id,
+    DonationCompletionStatus status,
+  ) async {
+    await dataSource.updateDonationCompletionStatus(id, status);
+  }
+
+  @override
+  Future<void> updateDonationsCompletionStatus(
+    List<String> ids,
+    DonationCompletionStatus status,
+  ) async {
+    await dataSource.updateDonationsCompletionStatus(ids, status);
+  }
+
+  // ============================================================
+  // Schedule Donations
+  // ============================================================
+
+  @override
+  Future<void> saveScheduleDonation(ScheduleDonation schedule) async {
+    await dataSource.saveScheduleDonation(schedule);
+  }
+
+  @override
+  List<ScheduleDonation> getScheduleDonations() {
+    return dataSource.getScheduleDonations();
+  }
+
+  @override
+  List<ScheduleDonation> getSchedulesByUid(String uid) {
+    return dataSource.getSchedulesByUid(uid);
+  }
+
+  @override
+  List<ScheduleDonation> getPendingSchedules() {
+    return dataSource.getPendingSchedules();
+  }
+
+  @override
+  Future<void> updateScheduleSyncStatus(String id, SyncStatus status) async {
+    await dataSource.updateScheduleSyncStatus(id, status);
+  }
+
+  @override
+  List<ScheduleDonation> getUndeliveredSchedules(String uid) {
+    return dataSource.getUndeliveredSchedules(uid);
+  }
+
+  @override
+  List<ScheduleDonation> getDeliveredSchedules(String uid) {
+    return dataSource.getDeliveredSchedules(uid);
+  }
+
+  @override
+  Future<void> markScheduleAsDelivered(String id) async {
+    await dataSource.markScheduleAsDelivered(id);
+  }
+
+  // ============================================================
+  // Pickup Donations
+  // ============================================================
+
+  @override
+  Future<void> savePickupDonation(PickupDonation pickup) async {
+    await dataSource.savePickupDonation(pickup);
+  }
+
+  @override
+  List<PickupDonation> getPickupDonations() {
+    return dataSource.getPickupDonations();
+  }
+
+  @override
+  List<PickupDonation> getPickupsByUid(String uid) {
+    return dataSource.getPickupsByUid(uid);
+  }
+
+  @override
+  List<PickupDonation> getPendingPickups() {
+    return dataSource.getPendingPickups();
+  }
+
+  @override
+  Future<void> updatePickupSyncStatus(String id, SyncStatus status) async {
+    await dataSource.updatePickupSyncStatus(id, status);
+  }
+
+  @override
+  List<PickupDonation> getUndeliveredPickups(String uid) {
+    return dataSource.getUndeliveredPickups(uid);
+  }
+
+  @override
+  List<PickupDonation> getDeliveredPickups(String uid) {
+    return dataSource.getDeliveredPickups(uid);
+  }
+
+  @override
+  Future<void> markPickupAsDelivered(String id) async {
+    await dataSource.markPickupAsDelivered(id);
+  }
+
+  // ============================================================
+  // Sync Queue
+  // ============================================================
+
+  @override
+  Future<void> addToSyncQueue(SyncQueueItem item) async {
+    await dataSource.addToSyncQueue(item);
+  }
+
+  @override
+  List<SyncQueueItem> getSyncQueue() {
+    return dataSource.getSyncQueue();
+  }
+
+  @override
+  List<SyncQueueItem> getPendingSyncItems() {
+    return dataSource.getPendingSyncItems();
+  }
+
+  @override
+  Future<void> updateSyncQueueItem(SyncQueueItem item) async {
+    await dataSource.updateSyncQueueItem(item);
+  }
+
+  @override
+  Future<void> removeFromSyncQueue(String itemId) async {
+    await dataSource.removeFromSyncQueue(itemId);
+  }
+
+  @override
+  Future<void> clearSyncQueue() async {
+    await dataSource.clearSyncQueue();
+  }
+
+  @override
+  bool hasPendingSync() {
+    return dataSource.hasPendingSync();
+  }
+
+  // ============================================================
+  // Utilidades
+  // ============================================================
+
+  @override
+  Future<void> clearAllLocalData() async {
+    await dataSource.clearAllLocalData();
   }
 }
