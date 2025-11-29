@@ -1,3 +1,4 @@
+/*
 import 'package:donation_app/presentation/providers/donations/donation_insights_provider.dart';
 import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 import 'package:donation_app/presentation/providers/sensors/location_provider.dart';
@@ -448,3 +449,4 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
     );
   }
 }
+*/

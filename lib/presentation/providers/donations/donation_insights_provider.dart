@@ -1,3 +1,4 @@
+/*
 import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 import 'package:donation_app/domain/use_cases/donations/cache_donation_insights.dart';
 import 'package:donation_app/domain/use_cases/donations/load_cached_insights.dart';
@@ -116,3 +117,4 @@ class DonationInsightsProvider extends ChangeNotifier {
     await loadInsights(forceRefresh: true);
   }
 }
+*/
