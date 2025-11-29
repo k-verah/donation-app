@@ -1,21 +1,99 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:donation_app/data/datasources/analytics/analytics_donation_pickup_datasource.dart';
 import 'package:donation_app/data/datasources/donations/booking_datasource.dart';
+import 'package:donation_app/data/datasources/donations/donations_datasource.dart';
 import 'package:donation_app/data/datasources/donations/pickup_donation_datasource.dart';
+import 'package:donation_app/data/services/sync/connectivity_service.dart';
+import 'package:donation_app/domain/entities/donations/donation_completion_status.dart';
 import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
+import 'package:donation_app/domain/entities/sync/sync_status.dart';
+import 'package:donation_app/domain/entities/sync/sync_queue_item.dart';
 import 'package:donation_app/domain/repositories/donations/pickup_donation_repository.dart';
+import 'package:donation_app/domain/repositories/local/local_storage_repository.dart';
+import 'package:uuid/uuid.dart';
 
 class PickupDonationRepositoryImpl implements PickupDonationRepository {
   final FirebaseFirestore db;
   final BookingDatasource bookingDS;
   final PickupDonationDatasource pickupDS;
   final AnalyticsRemoteDatasource analyticsDS;
+  final LocalStorageRepository localStorage;
+  final ConnectivityService connectivity;
+  final DonationsDataSource donationsDS;
 
   PickupDonationRepositoryImpl(
-      this.db, this.bookingDS, this.pickupDS, this.analyticsDS);
+    this.db,
+    this.bookingDS,
+    this.pickupDS,
+    this.analyticsDS, {
+    required this.localStorage,
+    required this.connectivity,
+    required this.donationsDS,
+  });
 
   @override
   Future<void> confirmPickup(PickupDonation p) async {
+    // 1. Guardar localmente primero (respuesta inmediata al usuario)
+    final pickupWithPending = p.copyWith(syncStatus: SyncStatus.pending);
+    await localStorage.savePickupDonation(pickupWithPending);
+
+    // 2. Marcar las donaciones asociadas como "pendientes de completar" (LOCAL)
+    await localStorage.updateDonationsCompletionStatus(
+      p.donationIds,
+      DonationCompletionStatus.pendingCompletion,
+    );
+    debugPrint(
+        '📦 Marked ${p.donationIds.length} donations as pending completion (local)');
+
+    // 3. Agregar a la cola de sincronización - pickup
+    final pickupSyncItem = SyncQueueItem(
+      id: const Uuid().v4(),
+      operation: SyncOperation.createPickup,
+      entityId: p.id,
+      payload: p.toJson(),
+      createdAt: DateTime.now(),
+    );
+    await localStorage.addToSyncQueue(pickupSyncItem);
+
+    // 4. Agregar a la cola de sincronización - completionStatus de donaciones
+    final donationsSyncItem = SyncQueueItem(
+      id: const Uuid().v4(),
+      operation: SyncOperation.markDonationsPendingCompletion,
+      entityId: p.id,
+      payload: {'donationIds': p.donationIds},
+      createdAt: DateTime.now(),
+    );
+    await localStorage.addToSyncQueue(donationsSyncItem);
+
+    debugPrint('📝 Pickup saved locally, pending sync: ${p.id}');
+
+    // 5. Si hay conexión, sincronizar inmediatamente
+    if (connectivity.isOnline) {
+      try {
+        // Sincronizar pickup a Firebase
+        await _syncToFirebase(p);
+        await localStorage.updatePickupSyncStatus(p.id, SyncStatus.synced);
+        await localStorage.removeFromSyncQueue(pickupSyncItem.id);
+
+        // Sincronizar completionStatus de donaciones a Firebase
+        await donationsDS.updateMultipleCompletionStatus(
+          p.donationIds,
+          DonationCompletionStatus.pendingCompletion,
+        );
+        await localStorage.removeFromSyncQueue(donationsSyncItem.id);
+
+        debugPrint('✅ Pickup and donations synced to Firebase: ${p.id}');
+      } catch (e) {
+        // Si falla, se sincronizará después via SyncService
+        debugPrint('⚠️ Immediate sync failed, will retry later: $e');
+      }
+    } else {
+      debugPrint('📴 Offline - pickup will sync when connection restored');
+    }
+  }
+
+  Future<void> _syncToFirebase(PickupDonation p) async {
     final docPickup = pickupDS.newDoc(p.id);
     final docDay = bookingDS.dayDoc(p.uid, p.date);
     final docAnalytics = analyticsDS.globalDoc();
@@ -30,25 +108,37 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
             (data['pickupId'] ?? '') != '';
         if (hasSchedule || hasPickup) {
           throw FirebaseException(
-              plugin: 'firestore',
-              message: 'You already have a donation scheduled for today.');
+            plugin: 'firestore',
+            message: 'You already have a donation scheduled for today.',
+          );
         }
       }
 
       tx.set(docPickup, pickupDS.toMap(p));
 
       tx.set(
-          docDay,
-          {
-            'uid': p.uid,
-            'dayKey': bookingDS.dayKey(p.date),
-            'scheduleId': null,
-            'pickupId': p.id,
-            'updatedAt': FieldValue.serverTimestamp(),
-          },
-          SetOptions(merge: true));
+        docDay,
+        {
+          'uid': p.uid,
+          'dayKey': bookingDS.dayKey(p.date),
+          'scheduleId': null,
+          'pickupId': p.id,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
       tx.set(docAnalytics, analyticsDS.incPickup(), SetOptions(merge: true));
     });
+  }
+
+  @override
+  List<PickupDonation> getPickupsByUid(String uid) {
+    return localStorage.getPickupsByUid(uid);
+  }
+
+  @override
+  List<PickupDonation> getPendingPickups() {
+    return localStorage.getPendingPickups();
   }
 }

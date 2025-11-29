@@ -1,3 +1,4 @@
+/*
 import 'package:donation_app/domain/entities/donations/donation.dart';
 import 'package:donation_app/domain/entities/foundations/foundation_point.dart';
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
@@ -168,3 +169,4 @@ class GetDonationInsightsByFoundation {
   static double _degStatic(double d) => d * 3.141592653589793 / 180.0;
   static double _hStatic(double x) => (1 - cos(x)) / 2;
 }
+*/

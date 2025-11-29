@@ -10,10 +10,14 @@ class ScheduleDonationDatasource {
 
   Map<String, dynamic> toMap(ScheduleDonation d) => {
         'uid': d.uid,
-        'title': d.title,
+        'foundationPointId': d.foundationPointId,
         'date': Timestamp.fromDate(d.date),
         'time': d.time,
         'notes': d.notes,
+        'donationIds': d.donationIds,
         'createdAt': FieldValue.serverTimestamp(),
+        'isDelivered': d.isDelivered,
+        'deliveredAt':
+            d.deliveredAt != null ? Timestamp.fromDate(d.deliveredAt!) : null,
       };
 }
