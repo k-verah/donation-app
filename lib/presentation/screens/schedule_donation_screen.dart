@@ -135,9 +135,7 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
       ),
       body: Column(
         children: [
-          // Banner de estado de sync
           const SyncStatusBanner(),
-
           Expanded(
             child: SafeArea(
               child: LayoutBuilder(

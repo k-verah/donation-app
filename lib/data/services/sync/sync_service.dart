@@ -163,6 +163,9 @@ class SyncService with BackgroundProcessingMixin {
       case SyncOperation.markPickupDelivered:
         await _syncPickupDelivered(item);
         break;
+      case SyncOperation.markDonationAvailable:
+        await _syncDonationAvailable(item);
+        break;
       default:
         debugPrint('⚠️ Unknown operation: ${item.operation}');
     }
@@ -309,6 +312,18 @@ class SyncService with BackgroundProcessingMixin {
     });
 
     debugPrint('✅ Pickup $pickupId marked as delivered in Firebase');
+  }
+
+  /// Sincroniza que una donación fue revertida a disponible
+  Future<void> _syncDonationAvailable(SyncQueueItem item) async {
+    final donationId = item.entityId;
+
+    await _donationsDS.updateCompletionStatus(
+      donationId,
+      DonationCompletionStatus.available,
+    );
+
+    debugPrint('✅ Donation $donationId reverted to available in Firebase');
   }
 
   Future<void> _markEntityAsFailed(SyncQueueItem item) async {

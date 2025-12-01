@@ -1,3 +1,4 @@
+import 'package:donation_app/presentation/widgets/sync_status_indicator.dart';
 import 'package:flutter/material.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -22,29 +23,36 @@ class NotificationsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Active Campaigns")),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (_, i) {
-          final c = items[i];
-          return Card(
-            elevation: 2,
-            child: ListTile(
-              leading: Icon(
-                Icons.campaign,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              title: Text(
-                c.title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(c.desc),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
+      body: Column(
+        children: [
+          const SyncStatusBanner(),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (_, i) {
+                final c = items[i];
+                return Card(
+                  elevation: 2,
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.campaign,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    title: Text(
+                      c.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(c.desc),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {},
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

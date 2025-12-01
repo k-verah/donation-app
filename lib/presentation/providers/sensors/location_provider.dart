@@ -47,6 +47,9 @@ class LocationProvider extends ChangeNotifier {
   GeoPoint? get current => _current;
   List<FoundationPoint> get points => _points;
 
+  bool _isOffline = false;
+  bool get isOffline => _isOffline;
+
   // ESTRATEGIA: Cargar datos desde local storage primero, luego actualizar
   Future<void> init() async {
     // 1. Cargar preferencias de filtros guardadas
@@ -54,11 +57,14 @@ class LocationProvider extends ChangeNotifier {
     cause = savedFilters['cause'] ?? 'All';
     access = savedFilters['access'] ?? 'All';
     schedule = savedFilters['schedule'] ?? 'All';
+    debugPrint(
+        '💾 Filtros cargados del caché: cause=$cause, access=$access, schedule=$schedule');
 
     // 2. Intentar cargar puntos desde cache
     final cachedPoints = loadCachedPoints();
     if (cachedPoints != null && cachedPoints.isNotEmpty) {
       _points = cachedPoints;
+      debugPrint('💾 ${cachedPoints.length} puntos cargados del caché');
       notifyListeners(); // Mostrar cache inmediatamente
     }
 
@@ -66,22 +72,31 @@ class LocationProvider extends ChangeNotifier {
     final lastLocation = loadLastLocation();
     if (lastLocation != null) {
       _current = lastLocation;
+      debugPrint(
+          '💾 Última ubicación cargada: ${lastLocation.lat}, ${lastLocation.lng}');
       notifyListeners();
     }
 
     // 4. Cargar datos frescos en paralelo
+    await _loadFreshData();
+  }
+
+  /// Intenta cargar datos frescos de la red
+  Future<void> _loadFreshData() async {
     try {
       final results = await Future.wait([
         getFoundationsPoints(),
         getCurrentLocation(),
-      ]);
+      ]).timeout(const Duration(seconds: 10));
 
       _points = results[0] as List<FoundationPoint>;
       _current = results[1] as GeoPoint?;
+      _isOffline = false;
 
       // Guardar en cache
       if (_points.isNotEmpty) {
         await cacheDonationPoints(_points);
+        debugPrint('☁️ ${_points.length} puntos sincronizados y cacheados');
       }
 
       // Guardar última ubicación
@@ -92,8 +107,21 @@ class LocationProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       // Si falla la carga, usar cache si está disponible
-      debugPrint('Error loading fresh data, using cache: $e');
+      _isOffline = true;
+      debugPrint('📴 Offline: usando caché local. Error: $e');
+
+      // Si no hay puntos en caché, notificar el estado
+      if (_points.isEmpty) {
+        debugPrint('⚠️ No hay puntos en caché disponibles');
+      }
+      notifyListeners();
     }
+  }
+
+  /// Refresca los datos (útil cuando vuelve la conexión)
+  Future<void> refresh() async {
+    debugPrint('🔄 Refrescando datos del mapa...');
+    await _loadFreshData();
   }
 
   List<(FoundationPoint, double)> sorted() => sortPoints(_points, _current);

@@ -39,9 +39,10 @@ class _DonationsScreenState extends State<DonationsScreen>
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Theme.of(context).colorScheme.primary,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Theme.of(context).colorScheme.primary,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white60,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
           tabs: const [
             Tab(text: 'Available', icon: Icon(Icons.inventory_2_outlined)),
             Tab(text: 'Completed', icon: Icon(Icons.check_circle_outline)),
@@ -115,17 +116,54 @@ class _CompletedDonationsTab extends StatelessWidget {
       return const _EmptyStateWidget(
         icon: Icons.check_circle_outline,
         title: 'No completed donations yet',
-        subtitle: 'Complete a delivery to see your donations here',
+        subtitle:
+            'Complete a reservation or a delivery to see your donations here',
       );
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: donations.length,
-      itemBuilder: (context, index) => _DonationCard(
-        donation: donations[index],
-        showCompletedBadge: true,
-      ),
+      itemBuilder: (context, index) {
+        final donation = donations[index];
+        return _DonationCard(
+          donation: donation,
+          showCompletedBadge: true,
+          onUndo: () async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('Undo Completion'),
+                content: const Text(
+                  'This will move the donation back to "Available". Are you sure?',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text('Cancel'),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text('Yes, Undo'),
+                  ),
+                ],
+              ),
+            );
+            if (confirmed == true && context.mounted) {
+              await context
+                  .read<DonationProvider>()
+                  .undoCompleteDonation(donation.id!);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Donation moved back to Available'),
+                  ),
+                );
+              }
+            }
+          },
+        );
+      },
     );
   }
 }
@@ -147,7 +185,8 @@ class _PendingDeliveriesTab extends StatelessWidget {
       return _EmptyStateWidget(
         icon: Icons.pending_actions,
         title: 'No pending deliveries',
-        subtitle: 'Schedule or request a pickup to see your packages here',
+        subtitle:
+            'Schedule a donation or request a pickup to see your reservations here',
         actionLabel: 'Go to Schedule',
         onAction: () => Navigator.pushNamed(context, '/schedule'),
       );
@@ -187,10 +226,12 @@ class _PendingDeliveriesTab extends StatelessWidget {
 class _DonationCard extends StatelessWidget {
   final Donation donation;
   final bool showCompletedBadge;
+  final VoidCallback? onUndo;
 
   const _DonationCard({
     required this.donation,
     this.showCompletedBadge = false,
+    this.onUndo,
   });
 
   @override
@@ -309,6 +350,29 @@ class _DonationCard extends StatelessWidget {
                           ),
                         );
                       }).toList(),
+                    ),
+                  ],
+                  // Botón para deshacer completado
+                  if (showCompletedBadge && onUndo != null) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 28,
+                      child: OutlinedButton.icon(
+                        onPressed: onUndo,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          side: BorderSide(color: Colors.orange.shade400),
+                          foregroundColor: Colors.orange.shade700,
+                        ),
+                        icon: const Icon(Icons.undo, size: 14),
+                        label: Text(
+                          'Undo Complete',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ],
@@ -742,10 +806,10 @@ class _EmptyStateWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,

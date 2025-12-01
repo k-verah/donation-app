@@ -1,6 +1,7 @@
 import 'package:donation_app/domain/entities/foundations/foundation_point.dart';
 import 'package:donation_app/presentation/providers/sensors/location_provider.dart';
 import 'package:donation_app/presentation/providers/analytics/analytics_provider.dart';
+import 'package:donation_app/presentation/widgets/sync_status_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -63,10 +64,9 @@ class _MapScreenState extends State<MapScreen> {
     _trackFilterUsage(vm.cause, vm.access, vm.schedule);
 
     // Si hay filtros activos, usar puntos filtrados; si no, mostrar todos
-    final sortedPoints = vm.hasActiveFilters() 
-        ? vm.getFilteredAndSorted() 
-        : vm.sorted();
-    
+    final sortedPoints =
+        vm.hasActiveFilters() ? vm.getFilteredAndSorted() : vm.sorted();
+
     // Obtener el punto recomendado solo si hay filtros activos
     FoundationPoint? recommendedPoint;
     if (vm.hasActiveFilters()) {
@@ -79,9 +79,10 @@ class _MapScreenState extends State<MapScreen> {
       );
       recommendedPoint = recommendation.best;
       vm.recommendationMsg = recommendation.message;
-      
+
       // Track point usage cuando se recomienda un punto
-      if (recommendedPoint != null && recommendedPoint.id != _lastRecommendedPoint?.id) {
+      if (recommendedPoint != null &&
+          recommendedPoint.id != _lastRecommendedPoint?.id) {
         _trackPointUsage(recommendedPoint);
         _lastRecommendedPoint = recommendedPoint;
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -97,8 +98,9 @@ class _MapScreenState extends State<MapScreen> {
     final markers = sortedPoints.asMap().entries.map((e) {
       final p = e.value.$1;
       final d = e.value.$2;
-      final isRecommended = recommendedPoint != null && p.id == recommendedPoint.id;
-      
+      final isRecommended =
+          recommendedPoint != null && p.id == recommendedPoint.id;
+
       return Marker(
         markerId: MarkerId(p.id),
         position: LatLng(p.pos.lat, p.pos.lng),
@@ -137,6 +139,7 @@ class _MapScreenState extends State<MapScreen> {
       ),
       body: Column(
         children: [
+          const SyncStatusBanner(),
           Padding(
             padding: const EdgeInsets.all(8),
             child: Row(

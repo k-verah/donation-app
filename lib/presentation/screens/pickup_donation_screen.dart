@@ -168,9 +168,7 @@ class _PickupScreenState extends State<PickupDonationScreen> {
       ),
       body: Column(
         children: [
-          // Banner de estado de sync
           const SyncStatusBanner(),
-
           Expanded(
             child: SafeArea(
               child: LayoutBuilder(

@@ -58,12 +58,23 @@ class ScheduleDonationProvider extends ChangeNotifier {
       );
       await confirmSchedule(donation);
       _selectedDonationIds.clear();
+      debugPrint('✅ Schedule creado: ${donation.id}');
       notifyListeners();
-      return null; // éxito
+      return null; // éxito (funciona offline, se sincroniza después)
     } on FirebaseException catch (e) {
+      debugPrint('⚠️ Firebase error en schedule: ${e.message}');
       return e.message ?? 'Could not schedule.';
-    } catch (_) {
-      return 'Unexpected error.';
+    } catch (e) {
+      debugPrint('⚠️ Error en schedule: $e');
+      // Si es error de red, el schedule ya se guardó localmente
+      if (e.toString().contains('network') ||
+          e.toString().contains('SocketException') ||
+          e.toString().contains('Connection')) {
+        _selectedDonationIds.clear();
+        notifyListeners();
+        return null; // Guardado localmente, se sincronizará después
+      }
+      return 'Unexpected error: $e';
     }
   }
 }

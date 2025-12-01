@@ -18,6 +18,9 @@ enum SyncOperation {
 
   /// Marca un pickup como entregado
   markPickupDelivered,
+
+  /// Revierte una donación completada a disponible
+  markDonationAvailable,
 }
 
 extension SyncOperationExtension on SyncOperation {

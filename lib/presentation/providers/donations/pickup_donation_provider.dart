@@ -57,12 +57,23 @@ class PickupDonationProvider extends ChangeNotifier {
       );
       await confirmPickup(pickup);
       _selectedDonationIds.clear();
+      debugPrint('✅ Pickup creado: ${pickup.id}');
       notifyListeners();
-      return null;
+      return null; // éxito (funciona offline, se sincroniza después)
     } on FirebaseException catch (e) {
+      debugPrint('⚠️ Firebase error en pickup: ${e.message}');
       return e.message ?? 'Could not book pickup.';
-    } catch (_) {
-      return 'Unexpected error.';
+    } catch (e) {
+      debugPrint('⚠️ Error en pickup: $e');
+      // Si es error de red, el pickup ya se guardó localmente
+      if (e.toString().contains('network') ||
+          e.toString().contains('SocketException') ||
+          e.toString().contains('Connection')) {
+        _selectedDonationIds.clear();
+        notifyListeners();
+        return null; // Guardado localmente, se sincronizará después
+      }
+      return 'Unexpected error: $e';
     }
   }
 }
