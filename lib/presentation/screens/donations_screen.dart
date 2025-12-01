@@ -133,10 +133,15 @@ class _CompletedDonationsTab extends StatelessWidget {
             final confirmed = await showDialog<bool>(
               context: context,
               builder: (ctx) => AlertDialog(
-                title: const Text('Undo Completion'),
+                title: const Text(
+                  'Undo Completion',
+                  textAlign: TextAlign.center,
+                ),
                 content: const Text(
                   'This will move the donation back to "Available". Are you sure?',
+                  textAlign: TextAlign.center,
                 ),
+                actionsAlignment: MainAxisAlignment.center,
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx, false),
@@ -156,7 +161,7 @@ class _CompletedDonationsTab extends StatelessWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Donation moved back to Available'),
+                    content: Text('Donation moved back to available'),
                     backgroundColor: Color(0xFF003137),
                   ),
                 );
@@ -436,9 +441,15 @@ class _SchedulePackageCard extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Complete Delivery'),
+        title: const Text(
+          'Complete Delivery',
+          textAlign: TextAlign.center,
+        ),
         content: Text(
-            'Mark ${schedule.donationIds.length} donation(s) as delivered?'),
+          'Mark ${schedule.donationIds.length} donation(s) as delivered?',
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -502,11 +513,15 @@ class _PickupPackageCard extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Complete Pickup'),
-        content: Text(
-          'Mark ${pickup.donationIds.length} donation(s) as picked up?\n\n'
-          'This action cannot be undone.',
+        title: const Text(
+          'Complete Pickup',
+          textAlign: TextAlign.center,
         ),
+        content: Text(
+          'Mark ${pickup.donationIds.length} donation(s) as picked up?',
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
