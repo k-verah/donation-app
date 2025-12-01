@@ -438,9 +438,7 @@ class _SchedulePackageCard extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Complete Delivery'),
         content: Text(
-          'Mark ${schedule.donationIds.length} donation(s) as delivered?\n\n'
-          'This action cannot be undone.',
-        ),
+            'Mark ${schedule.donationIds.length} donation(s) as delivered?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
