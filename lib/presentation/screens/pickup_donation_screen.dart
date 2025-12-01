@@ -310,16 +310,6 @@ class _PickupScreenState extends State<PickupDonationScreen> {
                               ),
                             ),
                           ),
-
-                          const SizedBox(height: 12),
-                          Text(
-                            "⚡ Works offline! Will sync when connected.",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
                         ],
                       ),
                     ),
