@@ -59,7 +59,6 @@ class LocationProvider extends ChangeNotifier {
     final cachedPoints = loadCachedPoints();
     if (cachedPoints != null && cachedPoints.isNotEmpty) {
       _points = cachedPoints;
-      debugPrint('💾 ${cachedPoints.length} puntos cargados del caché');
       notifyListeners();
     }
 
