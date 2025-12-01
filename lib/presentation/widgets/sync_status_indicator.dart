@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:donation_app/presentation/providers/sync/sync_provider.dart';
 import 'package:donation_app/data/services/sync/sync_service.dart';
 
-/// Widget que muestra el estado de conectividad y sincronización
 class SyncStatusIndicator extends StatelessWidget {
   const SyncStatusIndicator({super.key});
 
@@ -16,7 +15,6 @@ class SyncStatusIndicator extends StatelessWidget {
         final isSyncing = syncProvider.isSyncing;
         final pendingCount = syncProvider.pendingCount;
 
-        // Si está todo bien, no mostrar nada
         if (isOnline && pendingCount == 0 && !isSyncing) {
           return const SizedBox.shrink();
         }
@@ -134,7 +132,6 @@ class SyncStatusIndicator extends StatelessWidget {
   }
 }
 
-/// Banner compacto para mostrar en la parte inferior de pantallas
 class SyncStatusBanner extends StatelessWidget {
   const SyncStatusBanner({super.key});
 
