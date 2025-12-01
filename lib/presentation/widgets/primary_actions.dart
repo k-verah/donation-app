@@ -23,7 +23,6 @@ class PrimaryActions extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Nueva Donación
               SizedBox(
                 height: 60,
                 child: FilledButton.icon(
@@ -40,8 +39,6 @@ class PrimaryActions extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Ubicar fundaciones más cercanas
               SizedBox(
                 height: 56,
                 child: OutlinedButton.icon(
