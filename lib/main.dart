@@ -2,6 +2,7 @@ import 'package:donation_app/presentation/providers/auth/auth_provider.dart';
 import 'package:donation_app/presentation/screens/donations_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'composition_root.dart';
@@ -21,6 +22,10 @@ import 'presentation/screens/analytics_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
   runApp(const Recyclothes());
 }
 
@@ -117,4 +122,3 @@ class _AuthRedirectorState extends State<_AuthRedirector> {
     return widget.child;
   }
 }
-

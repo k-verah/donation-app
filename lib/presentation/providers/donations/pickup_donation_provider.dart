@@ -56,15 +56,12 @@ class PickupDonationProvider extends ChangeNotifier {
       );
       await confirmPickup(pickup);
       _selectedDonationIds.clear();
-      debugPrint('Pickup creado: ${pickup.id}');
+
       notifyListeners();
       return null;
     } on FirebaseException catch (e) {
-      debugPrint('Firebase error en pickup: ${e.message}');
       return e.message ?? 'Could not book pickup.';
     } catch (e) {
-      debugPrint('Error en pickup: $e');
-
       if (e.toString().contains('network') ||
           e.toString().contains('SocketException') ||
           e.toString().contains('Connection')) {

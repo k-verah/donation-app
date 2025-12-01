@@ -50,38 +50,28 @@ class LocationProvider extends ChangeNotifier {
   bool _isOffline = false;
   bool get isOffline => _isOffline;
 
-  // ESTRATEGIA: Cargar datos desde local storage primero, luego actualizar
   Future<void> init() async {
-    // 1. Cargar preferencias de filtros guardadas
     final savedFilters = loadFilterPreferences();
     cause = savedFilters['cause'] ?? 'All';
     access = savedFilters['access'] ?? 'All';
     schedule = savedFilters['schedule'] ?? 'All';
-    debugPrint(
-        '💾 Filtros cargados del caché: cause=$cause, access=$access, schedule=$schedule');
 
-    // 2. Intentar cargar puntos desde cache
     final cachedPoints = loadCachedPoints();
     if (cachedPoints != null && cachedPoints.isNotEmpty) {
       _points = cachedPoints;
       debugPrint('💾 ${cachedPoints.length} puntos cargados del caché');
-      notifyListeners(); // Mostrar cache inmediatamente
-    }
-
-    // 3. Cargar última ubicación conocida
-    final lastLocation = loadLastLocation();
-    if (lastLocation != null) {
-      _current = lastLocation;
-      debugPrint(
-          '💾 Última ubicación cargada: ${lastLocation.lat}, ${lastLocation.lng}');
       notifyListeners();
     }
 
-    // 4. Cargar datos frescos en paralelo
+    final lastLocation = loadLastLocation();
+    if (lastLocation != null) {
+      _current = lastLocation;
+      notifyListeners();
+    }
+
     await _loadFreshData();
   }
 
-  /// Intenta cargar datos frescos de la red
   Future<void> _loadFreshData() async {
     try {
       final results = await Future.wait([
@@ -93,34 +83,24 @@ class LocationProvider extends ChangeNotifier {
       _current = results[1] as GeoPoint?;
       _isOffline = false;
 
-      // Guardar en cache
       if (_points.isNotEmpty) {
         await cacheDonationPoints(_points);
-        debugPrint('☁️ ${_points.length} puntos sincronizados y cacheados');
       }
 
-      // Guardar última ubicación
       if (_current != null) {
         await saveLastLocation(_current!);
       }
 
       notifyListeners();
     } catch (e) {
-      // Si falla la carga, usar cache si está disponible
       _isOffline = true;
-      debugPrint('📴 Offline: usando caché local. Error: $e');
 
-      // Si no hay puntos en caché, notificar el estado
-      if (_points.isEmpty) {
-        debugPrint('⚠️ No hay puntos en caché disponibles');
-      }
+      if (_points.isEmpty) {}
       notifyListeners();
     }
   }
 
-  /// Refresca los datos (útil cuando vuelve la conexión)
   Future<void> refresh() async {
-    debugPrint('🔄 Refrescando datos del mapa...');
     await _loadFreshData();
   }
 
@@ -144,13 +124,11 @@ class LocationProvider extends ChangeNotifier {
     return cause != 'All' || access != 'All' || schedule != 'All';
   }
 
-  // Guardar preferencias cuando cambian los filtros
   void setFilters({String? causeVal, String? accessVal, String? scheduleVal}) {
     if (causeVal != null) cause = causeVal;
     if (accessVal != null) access = accessVal;
     if (scheduleVal != null) schedule = scheduleVal;
 
-    // Guardar en local storage
     saveFilterPreferences(
       cause: cause,
       access: access,
