@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyBgmSJbhF4JKO5_2TFBXkk8vJLtB2R3rls</string>
+	<string>AIzaSyCRWPr-YlQSpotcWaDja8EDwkFQA-62JMs</string>
 	<key>GCM_SENDER_ID</key>
 	<string>802764704131</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>recyclothes</string>
+	<string>moviles.42.recyclothes</string>
 	<key>PROJECT_ID</key>
 	<string>recyclothes-71fdd</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,7 +25,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:802764704131:ios:2eeb8bf179cbcd63ce8eb6</string>
+	<string>1:802764704131:ios:3d7cf6a45b6d8173ce8eb6</string>
 	<key>DATABASE_URL</key>
 	<string>https://recyclothes-71fdd-default-rtdb.firebaseio.com</string>
 </dict>
