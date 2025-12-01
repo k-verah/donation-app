@@ -40,19 +40,15 @@ class ScheduleDonationRepositoryImpl implements ScheduleDonationRepository {
         message: 'You already have a donation scheduled for this date.',
       );
     }
-    // 1. Guardar localmente primero (respuesta inmediata al usuario)
+
     final scheduleWithPending = d.copyWith(syncStatus: SyncStatus.pending);
     await localStorage.saveScheduleDonation(scheduleWithPending);
 
-    // 2. Marcar las donaciones asociadas como "pendientes de completar" (LOCAL)
     await localStorage.updateDonationsCompletionStatus(
       d.donationIds,
       DonationCompletionStatus.pendingCompletion,
     );
-    debugPrint(
-        '📦 Marked ${d.donationIds.length} donations as pending completion (local)');
 
-    // 3. Agregar a la cola de sincronización - schedule
     final scheduleSyncItem = SyncQueueItem(
       id: const Uuid().v4(),
       operation: SyncOperation.createSchedule,
@@ -62,7 +58,6 @@ class ScheduleDonationRepositoryImpl implements ScheduleDonationRepository {
     );
     await localStorage.addToSyncQueue(scheduleSyncItem);
 
-    // 4. Agregar a la cola de sincronización - completionStatus de donaciones
     final donationsSyncItem = SyncQueueItem(
       id: const Uuid().v4(),
       operation: SyncOperation.markDonationsPendingCompletion,
@@ -72,31 +67,19 @@ class ScheduleDonationRepositoryImpl implements ScheduleDonationRepository {
     );
     await localStorage.addToSyncQueue(donationsSyncItem);
 
-    debugPrint('📝 Schedule saved locally, pending sync: ${d.id}');
-
-    // 5. Si hay conexión, sincronizar inmediatamente
     if (connectivity.isOnline) {
       try {
-        // Sincronizar schedule a Firebase
         await _syncToFirebase(d);
         await localStorage.updateScheduleSyncStatus(d.id, SyncStatus.synced);
         await localStorage.removeFromSyncQueue(scheduleSyncItem.id);
 
-        // Sincronizar completionStatus de donaciones a Firebase
         await donationsDS.updateMultipleCompletionStatus(
           d.donationIds,
           DonationCompletionStatus.pendingCompletion,
         );
         await localStorage.removeFromSyncQueue(donationsSyncItem.id);
-
-        debugPrint('✅ Schedule and donations synced to Firebase: ${d.id}');
-      } catch (e) {
-        // Si falla, se sincronizará después via SyncService
-        debugPrint('⚠️ Immediate sync failed, will retry later: $e');
-      }
-    } else {
-      debugPrint('📴 Offline - schedule will sync when connection restored');
-    }
+      } catch (e) {}
+    } else {}
   }
 
   Future<void> _syncToFirebase(ScheduleDonation d) async {

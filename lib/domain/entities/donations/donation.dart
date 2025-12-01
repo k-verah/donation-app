@@ -47,7 +47,6 @@ class Donation {
         completionStatus: completionStatus ?? this.completionStatus,
       );
 
-  /// Serializa a JSON para SharedPreferences
   Map<String, dynamic> toJson() => {
         'id': id,
         'uid': uid,
@@ -62,7 +61,6 @@ class Donation {
         'completionStatus': completionStatus.toJson(),
       };
 
-  /// Deserializa desde JSON de SharedPreferences
   factory Donation.fromJson(Map<String, dynamic> json) => Donation(
         id: json['id'] as String?,
         uid: json['uid'] as String,

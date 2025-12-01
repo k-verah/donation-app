@@ -1,12 +1,8 @@
-/// Estado de completitud de una donación
 enum DonationCompletionStatus {
-  /// Donación creada, disponible para asociar a schedule/pickup
   available,
 
-  /// Asociada a un schedule/pickup, pendiente de entrega
   pendingCompletion,
 
-  /// Donación entregada exitosamente
   completed,
 }
 

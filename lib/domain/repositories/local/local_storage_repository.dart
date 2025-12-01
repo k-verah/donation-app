@@ -8,7 +8,6 @@ import 'package:donation_app/domain/entities/sync/sync_status.dart';
 import 'package:donation_app/domain/entities/sync/sync_queue_item.dart';
 
 abstract class LocalStorageRepository {
-  // Filtros y ubicación
   Future<void> saveFilterPreferences({
     required String cause,
     required String access,
@@ -22,7 +21,6 @@ abstract class LocalStorageRepository {
   bool isCacheValid();
   Future<void> clearCache();
 
-  // Donations
   Future<void> saveDonation(Donation donation);
   Future<void> saveDonations(List<Donation> donations);
   List<Donation> getDonations();
@@ -31,7 +29,6 @@ abstract class LocalStorageRepository {
   Future<void> updateDonationSyncStatus(String id, SyncStatus status);
   bool isDonationsCacheValid();
 
-  // Donations - Completion Status
   List<Donation> getAvailableDonations(String uid);
   List<Donation> getPendingCompletionDonations(String uid);
   List<Donation> getCompletedDonations(String uid);
@@ -40,7 +37,6 @@ abstract class LocalStorageRepository {
   Future<void> updateDonationsCompletionStatus(
       List<String> ids, DonationCompletionStatus status);
 
-  // Schedule Donations
   Future<void> saveScheduleDonation(ScheduleDonation schedule);
   List<ScheduleDonation> getScheduleDonations();
   List<ScheduleDonation> getSchedulesByUid(String uid);
@@ -50,7 +46,6 @@ abstract class LocalStorageRepository {
   List<ScheduleDonation> getDeliveredSchedules(String uid);
   Future<void> markScheduleAsDelivered(String id);
 
-  // Pickup Donations
   Future<void> savePickupDonation(PickupDonation pickup);
   List<PickupDonation> getPickupDonations();
   List<PickupDonation> getPickupsByUid(String uid);
@@ -62,7 +57,6 @@ abstract class LocalStorageRepository {
 
   bool hasBookingForDate(String uid, DateTime date);
 
-  // Sync Queue
   Future<void> addToSyncQueue(SyncQueueItem item);
   List<SyncQueueItem> getSyncQueue();
   List<SyncQueueItem> getPendingSyncItems();
@@ -71,6 +65,5 @@ abstract class LocalStorageRepository {
   Future<void> clearSyncQueue();
   bool hasPendingSync();
 
-  // Utilidades
   Future<void> clearAllLocalData();
 }

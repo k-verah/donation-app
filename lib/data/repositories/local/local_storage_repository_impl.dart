@@ -14,10 +14,6 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
 
   LocalStorageRepositoryImpl(this.dataSource);
 
-  // ============================================================
-  // Filtros y ubicación (existentes)
-  // ============================================================
-
   @override
   Future<void> saveFilterPreferences({
     required String cause,
@@ -66,10 +62,6 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
     await dataSource.clearCache();
   }
 
-  // ============================================================
-  // Donations
-  // ============================================================
-
   @override
   Future<void> saveDonation(Donation donation) async {
     await dataSource.saveDonation(donation);
@@ -105,10 +97,6 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
     return dataSource.isDonationsCacheValid();
   }
 
-  // ============================================================
-  // Donations - Completion Status
-  // ============================================================
-
   @override
   List<Donation> getAvailableDonations(String uid) {
     return dataSource.getAvailableDonations(uid);
@@ -139,10 +127,6 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
   ) async {
     await dataSource.updateDonationsCompletionStatus(ids, status);
   }
-
-  // ============================================================
-  // Schedule Donations
-  // ============================================================
 
   @override
   Future<void> saveScheduleDonation(ScheduleDonation schedule) async {
@@ -183,10 +167,6 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
   Future<void> markScheduleAsDelivered(String id) async {
     await dataSource.markScheduleAsDelivered(id);
   }
-
-  // ============================================================
-  // Pickup Donations
-  // ============================================================
 
   @override
   Future<void> savePickupDonation(PickupDonation pickup) async {
@@ -233,10 +213,6 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
     return dataSource.hasBookingForDate(uid, date);
   }
 
-  // ============================================================
-  // Sync Queue
-  // ============================================================
-
   @override
   Future<void> addToSyncQueue(SyncQueueItem item) async {
     await dataSource.addToSyncQueue(item);
@@ -271,10 +247,6 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
   bool hasPendingSync() {
     return dataSource.hasPendingSync();
   }
-
-  // ============================================================
-  // Utilidades
-  // ============================================================
 
   @override
   Future<void> clearAllLocalData() async {

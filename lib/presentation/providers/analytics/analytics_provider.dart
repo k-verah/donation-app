@@ -60,13 +60,11 @@ class AnalyticsProvider extends ChangeNotifier {
     );
   }
 
-  // ESTRATEGIA 3: Carga paralela de estadísticas usando Future.wait
   Future<void> loadStats() async {
     _loading = true;
     notifyListeners();
 
     try {
-      // Cargar ambas estadísticas en paralelo en lugar de secuencialmente
       final results = await Future.wait([
         _getFilterCombinationStats.call(),
         _getPointUsageStats.call(),

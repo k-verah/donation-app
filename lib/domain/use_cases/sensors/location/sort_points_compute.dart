@@ -2,11 +2,9 @@ import 'dart:math' show cos, asin, sqrt;
 import 'package:donation_app/domain/entities/foundations/foundation_point.dart';
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
 
-// ✅ Funciones helper de nivel superior (top-level) para usar con compute
 double _deg(double d) => d * 3.141592653589793 / 180.0;
 double _h(double x) => (1 - cos(x)) / 2;
 
-// Función top-level para usar con compute (debe ser serializable)
 List<(FoundationPoint, double)> _sortPointsInIsolate(
   Map<String, dynamic> data,
 ) {
@@ -30,7 +28,6 @@ List<(FoundationPoint, double)> _sortPointsInIsolate(
   return list;
 }
 
-// Clase helper para serialización
 class SortPointsData {
   final List<FoundationPoint> points;
   final GeoPoint? origin;

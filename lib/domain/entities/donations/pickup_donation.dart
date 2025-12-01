@@ -49,7 +49,6 @@ class PickupDonation {
         deliveredAt: deliveredAt ?? this.deliveredAt,
       );
 
-  /// Serializa a JSON para SharedPreferences
   Map<String, dynamic> toJson() => {
         'id': id,
         'uid': uid,
@@ -64,7 +63,6 @@ class PickupDonation {
         'deliveredAt': deliveredAt?.millisecondsSinceEpoch,
       };
 
-  /// Deserializa desde JSON de SharedPreferences
   factory PickupDonation.fromJson(Map<String, dynamic> json) => PickupDonation(
         id: json['id'] as String,
         uid: json['uid'] as String,

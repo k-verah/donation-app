@@ -26,7 +26,6 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
   @override
   void initState() {
     super.initState();
-    // Limpiar selección anterior
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ScheduleDonationProvider>().clearSelection();
     });
@@ -129,7 +128,6 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
   Widget build(BuildContext context) {
     final donationProvider = context.watch<DonationProvider>();
     final scheduleProvider = context.watch<ScheduleDonationProvider>();
-    // Solo mostrar donaciones disponibles (no asociadas a ningún schedule/pickup)
     final donations = donationProvider.availableDonations;
 
     return Scaffold(
@@ -171,19 +169,15 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
                             ),
                           ),
                           const SizedBox(height: 20),
-
-                          // Lista de donaciones seleccionables
                           DonationSelectionList(
                             donations: donations,
                             selectedIds: scheduleProvider.selectedDonationIds,
                             onToggle: scheduleProvider.toggleDonation,
                             emptyMessage: 'No donations to schedule',
                           ),
-
                           const SizedBox(height: 24),
                           Divider(color: Colors.grey.shade300),
                           const SizedBox(height: 16),
-
                           Text(
                             "Schedule Details",
                             style: GoogleFonts.montserrat(
@@ -192,7 +186,6 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-
                           TextFormField(
                             controller: _dateController,
                             autovalidateMode:
@@ -241,8 +234,6 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
                             ),
                           ),
                           const SizedBox(height: 25),
-
-                          // Botón de confirmar
                           ElevatedButton(
                             onPressed:
                                 scheduleProvider.selectedDonationIds.isNotEmpty

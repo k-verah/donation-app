@@ -29,7 +29,7 @@ class _PickupScreenState extends State<PickupDonationScreen> {
   @override
   void initState() {
     super.initState();
-    // Limpiar selección anterior
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PickupDonationProvider>().clearSelection();
     });
@@ -156,7 +156,7 @@ class _PickupScreenState extends State<PickupDonationScreen> {
   Widget build(BuildContext context) {
     final donationProvider = context.watch<DonationProvider>();
     final pickupProvider = context.watch<PickupDonationProvider>();
-    // Solo mostrar donaciones disponibles (no asociadas a ningún schedule/pickup)
+
     final donations = donationProvider.availableDonations;
 
     return Scaffold(
@@ -197,19 +197,15 @@ class _PickupScreenState extends State<PickupDonationScreen> {
                             ),
                           ),
                           const SizedBox(height: 20),
-
-                          // Lista de donaciones seleccionables
                           DonationSelectionList(
                             donations: donations,
                             selectedIds: pickupProvider.selectedDonationIds,
                             onToggle: pickupProvider.toggleDonation,
                             emptyMessage: 'No donations for pickup',
                           ),
-
                           const SizedBox(height: 24),
                           Divider(color: Colors.grey.shade300),
                           const SizedBox(height: 16),
-
                           Text(
                             "Pickup Details",
                             style: GoogleFonts.montserrat(
@@ -218,7 +214,6 @@ class _PickupScreenState extends State<PickupDonationScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-
                           TextFormField(
                             controller: _locationController,
                             autovalidateMode:
@@ -283,8 +278,6 @@ class _PickupScreenState extends State<PickupDonationScreen> {
                                 : null,
                           ),
                           const SizedBox(height: 25),
-
-                          // Botón de confirmar
                           ElevatedButton(
                             onPressed:
                                 pickupProvider.selectedDonationIds.isNotEmpty

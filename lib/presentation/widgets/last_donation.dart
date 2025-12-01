@@ -24,7 +24,6 @@ class LastDonationCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Miniatura
             SizedBox(
               width: 64,
               height: 64,
@@ -41,7 +40,6 @@ class LastDonationCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            // Texto
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -69,10 +69,6 @@ class _DonationsScreenState extends State<DonationsScreen>
   }
 }
 
-// ============================================================
-// TAB 1: Donaciones Disponibles
-// ============================================================
-
 class _AvailableDonationsTab extends StatelessWidget {
   const _AvailableDonationsTab();
 
@@ -99,10 +95,6 @@ class _AvailableDonationsTab extends StatelessWidget {
     );
   }
 }
-
-// ============================================================
-// TAB 2: Donaciones Completadas
-// ============================================================
 
 class _CompletedDonationsTab extends StatelessWidget {
   const _CompletedDonationsTab();
@@ -174,10 +166,6 @@ class _CompletedDonationsTab extends StatelessWidget {
   }
 }
 
-// ============================================================
-// TAB 3: Entregas Pendientes (Paquetes)
-// ============================================================
-
 class _PendingDeliveriesTab extends StatelessWidget {
   const _PendingDeliveriesTab();
 
@@ -227,10 +215,6 @@ class _PendingDeliveriesTab extends StatelessWidget {
   }
 }
 
-// ============================================================
-// Widget: Tarjeta de Donación
-// ============================================================
-
 class _DonationCard extends StatelessWidget {
   final Donation donation;
   final bool showCompletedBadge;
@@ -255,7 +239,6 @@ class _DonationCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Imagen
             SizedBox(
               width: 70,
               height: 70,
@@ -275,8 +258,6 @@ class _DonationCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-
-            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,7 +341,6 @@ class _DonationCard extends StatelessWidget {
                       }).toList(),
                     ),
                   ],
-                  // Botón para deshacer completado
                   if (showCompletedBadge && onUndo != null) ...[
                     const SizedBox(height: 8),
                     SizedBox(
@@ -392,10 +372,6 @@ class _DonationCard extends StatelessWidget {
     );
   }
 }
-
-// ============================================================
-// Widget: Tarjeta de Paquete de Schedule
-// ============================================================
 
 class _SchedulePackageCard extends StatelessWidget {
   final ScheduleDonation schedule;
@@ -465,10 +441,6 @@ class _SchedulePackageCard extends StatelessWidget {
   }
 }
 
-// ============================================================
-// Widget: Tarjeta de Paquete de Pickup
-// ============================================================
-
 class _PickupPackageCard extends StatelessWidget {
   final PickupDonation pickup;
 
@@ -536,10 +508,6 @@ class _PickupPackageCard extends StatelessWidget {
     );
   }
 }
-
-// ============================================================
-// Widget: Tarjeta de Paquete Genérica
-// ============================================================
 
 class _PackageCard extends StatefulWidget {
   final IconData icon;
@@ -644,7 +612,6 @@ class _PackageCardState extends State<_PackageCard> {
             ),
           ),
 
-          // Donations list (expandable)
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),
             secondChild: Container(
@@ -748,10 +715,6 @@ class _MiniDonationTile extends StatelessWidget {
   }
 }
 
-// ============================================================
-// Widget: Header de Sección
-// ============================================================
-
 class _SectionHeader extends StatelessWidget {
   final String title;
   final int count;
@@ -797,10 +760,6 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
-
-// ============================================================
-// Widget: Estado Vacío
-// ============================================================
 
 class _EmptyStateWidget extends StatelessWidget {
   final IconData icon;

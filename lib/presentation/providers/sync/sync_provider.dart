@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:donation_app/data/services/sync/connectivity_service.dart';
 import 'package:donation_app/data/services/sync/sync_service.dart';
 
-/// Provider que expone el estado de conectividad y sincronización a la UI
 class SyncProvider extends ChangeNotifier {
   final ConnectivityService _connectivity;
   final SyncService _syncService;
@@ -43,7 +42,6 @@ class SyncProvider extends ChangeNotifier {
     });
   }
 
-  /// Fuerza una sincronización manual
   Future<void> forceSync() async {
     await _syncService.syncPendingOperations();
   }

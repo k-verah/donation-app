@@ -60,14 +60,11 @@ class _MapScreenState extends State<MapScreen> {
     final vm = context.watch<LocationProvider>();
     final origin = vm.current ?? LocationProvider.bogota;
 
-    // Track filter usage cuando cambian los filtros
     _trackFilterUsage(vm.cause, vm.access, vm.schedule);
 
-    // Si hay filtros activos, usar puntos filtrados; si no, mostrar todos
     final sortedPoints =
         vm.hasActiveFilters() ? vm.getFilteredAndSorted() : vm.sorted();
 
-    // Obtener el punto recomendado solo si hay filtros activos
     FoundationPoint? recommendedPoint;
     if (vm.hasActiveFilters()) {
       final recommendation = vm.recommendUC(
@@ -80,7 +77,6 @@ class _MapScreenState extends State<MapScreen> {
       recommendedPoint = recommendation.best;
       vm.recommendationMsg = recommendation.message;
 
-      // Track point usage cuando se recomienda un punto
       if (recommendedPoint != null &&
           recommendedPoint.id != _lastRecommendedPoint?.id) {
         _trackPointUsage(recommendedPoint);
@@ -94,7 +90,6 @@ class _MapScreenState extends State<MapScreen> {
       vm.recommendationMsg = null;
     }
 
-    // Crear marcadores: todos rojos por defecto, excepto el recomendado que será verde
     final markers = sortedPoints.asMap().entries.map((e) {
       final p = e.value.$1;
       final d = e.value.$2;
@@ -112,7 +107,6 @@ class _MapScreenState extends State<MapScreen> {
             ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
             : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
         onTap: () {
-          // Track cuando el usuario toca un marcador
           _trackPointUsage(p);
         },
       );

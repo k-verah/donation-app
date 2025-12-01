@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:donation_app/domain/entities/donations/donation.dart';
 
-/// Widget reutilizable para seleccionar donaciones mediante un modal
 class DonationSelectionList extends StatelessWidget {
   final List<Donation> donations;
   final Set<String> selectedIds;
@@ -32,7 +31,6 @@ class DonationSelectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Si no hay donaciones disponibles
     if (donations.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
@@ -67,14 +65,12 @@ class DonationSelectionList extends StatelessWidget {
       );
     }
 
-    // Obtener las donaciones seleccionadas
     final selectedDonations =
         donations.where((d) => selectedIds.contains(d.id)).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Botón para abrir el modal de selección
         InkWell(
           onTap: () => _showSelectionModal(context),
           borderRadius: BorderRadius.circular(12),
@@ -167,8 +163,6 @@ class DonationSelectionList extends StatelessWidget {
             ),
           ),
         ),
-
-        // Mostrar las donaciones seleccionadas
         if (selectedDonations.isNotEmpty) ...[
           const SizedBox(height: 16),
           Text(
@@ -191,8 +185,6 @@ class DonationSelectionList extends StatelessWidget {
             }).toList(),
           ),
         ],
-
-        // Mensaje si no hay selección
         if (selectedIds.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 10),
@@ -216,7 +208,6 @@ class DonationSelectionList extends StatelessWidget {
   }
 }
 
-/// Chip que muestra una donación seleccionada
 class _SelectedDonationChip extends StatelessWidget {
   final Donation donation;
   final VoidCallback onRemove;
@@ -278,7 +269,6 @@ class _SelectedDonationChip extends StatelessWidget {
   }
 }
 
-/// Modal para seleccionar donaciones
 class _DonationSelectionModal extends StatefulWidget {
   final List<Donation> donations;
   final Set<String> selectedIds;
@@ -315,7 +305,6 @@ class _DonationSelectionModalState extends State<_DonationSelectionModal> {
   }
 
   void _confirmSelection() {
-    // Sincronizar con el estado del padre
     final toAdd = _localSelectedIds.difference(widget.selectedIds);
     final toRemove = widget.selectedIds.difference(_localSelectedIds);
 
@@ -344,7 +333,6 @@ class _DonationSelectionModalState extends State<_DonationSelectionModal> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar
           Padding(
             padding: const EdgeInsets.only(top: 12),
             child: Container(
@@ -356,8 +344,6 @@ class _DonationSelectionModalState extends State<_DonationSelectionModal> {
               ),
             ),
           ),
-
-          // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
             child: Row(
@@ -421,10 +407,7 @@ class _DonationSelectionModalState extends State<_DonationSelectionModal> {
               ],
             ),
           ),
-
           Divider(height: 1, color: Colors.grey.shade200),
-
-          // Lista de donaciones
           Flexible(
             child: ListView.separated(
               shrinkWrap: true,
@@ -447,8 +430,6 @@ class _DonationSelectionModalState extends State<_DonationSelectionModal> {
               },
             ),
           ),
-
-          // Botón de confirmar
           Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
             decoration: BoxDecoration(
@@ -497,7 +478,6 @@ class _DonationSelectionModalState extends State<_DonationSelectionModal> {
   }
 }
 
-/// Tile individual de donación en el modal
 class _DonationTile extends StatelessWidget {
   final Donation donation;
   final bool isSelected;
@@ -518,7 +498,6 @@ class _DonationTile extends StatelessWidget {
         color: isSelected ? const Color(0xFF003137).withOpacity(0.06) : null,
         child: Row(
           children: [
-            // Checkbox animado
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 26,
@@ -539,8 +518,6 @@ class _DonationTile extends StatelessWidget {
                   : null,
             ),
             const SizedBox(width: 14),
-
-            // Icono de gancho de ropa
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -554,8 +531,6 @@ class _DonationTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-
-            // Información de la donación
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -582,8 +557,6 @@ class _DonationTile extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Tag (si hay)
             if (donation.tags.isNotEmpty)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

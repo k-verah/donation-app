@@ -9,7 +9,6 @@ class DonationsDataSource {
       db.collection('donations');
 
   Future<String> create(Map<String, dynamic> data) async {
-    // Asegurar que completionStatus esté incluido
     data['completionStatus'] ??= DonationCompletionStatus.available.toJson();
     final doc = await _collection.add(data);
     return doc.id;
@@ -22,7 +21,6 @@ class DonationsDataSource {
         .snapshots();
   }
 
-  /// Actualiza el completionStatus de una donación en Firebase
   Future<void> updateCompletionStatus(
     String donationId,
     DonationCompletionStatus status,
@@ -32,8 +30,6 @@ class DonationsDataSource {
     });
   }
 
-  /// Actualiza el completionStatus de múltiples donaciones en Firebase
-  /// Usa batch write para eficiencia
   Future<void> updateMultipleCompletionStatus(
     List<String> donationIds,
     DonationCompletionStatus status,

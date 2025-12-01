@@ -43,7 +43,6 @@ class DonationsRepositoryImpl implements DonationsRepository {
           tags: List<String>.from(m['tags'] ?? const []),
           createdAt: createdAt,
           localImagePath: m['localImagePath'],
-          // Leer completionStatus de Firebase (con fallback a 'available')
           completionStatus: DonationCompletionStatusExtension.fromJson(
             m['completionStatus'] as String?,
           ),

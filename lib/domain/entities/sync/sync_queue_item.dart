@@ -1,4 +1,3 @@
-/// Tipos de operación para la cola de sincronización
 enum SyncOperation {
   createDonation,
   createSchedule,
@@ -7,19 +6,14 @@ enum SyncOperation {
   updateSchedule,
   updatePickup,
 
-  /// Actualiza completionStatus de donaciones a pendingCompletion
   markDonationsPendingCompletion,
 
-  /// Actualiza completionStatus de donaciones a completed
   markDonationsCompleted,
 
-  /// Marca un schedule como entregado
   markScheduleDelivered,
 
-  /// Marca un pickup como entregado
   markPickupDelivered,
 
-  /// Revierte una donación completada a disponible
   markDonationAvailable,
 }
 
@@ -34,7 +28,6 @@ extension SyncOperationExtension on SyncOperation {
   }
 }
 
-/// Item en la cola de sincronización
 class SyncQueueItem {
   final String id;
   final SyncOperation operation;
@@ -72,7 +65,6 @@ class SyncQueueItem {
         lastError: lastError ?? this.lastError,
       );
 
-  /// Serializa a JSON para SharedPreferences
   Map<String, dynamic> toJson() => {
         'id': id,
         'operation': operation.toJson(),
@@ -84,7 +76,6 @@ class SyncQueueItem {
         'lastError': lastError,
       };
 
-  /// Deserializa desde JSON de SharedPreferences
   factory SyncQueueItem.fromJson(Map<String, dynamic> json) => SyncQueueItem(
         id: json['id'] as String,
         operation: SyncOperationExtension.fromJson(json['operation'] as String),
@@ -99,7 +90,6 @@ class SyncQueueItem {
         lastError: json['lastError'] as String?,
       );
 
-  /// Máximo de reintentos antes de marcar como fallido permanente
   static const int maxAttempts = 5;
 
   bool get canRetry => attempts < maxAttempts;

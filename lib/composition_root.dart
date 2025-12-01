@@ -148,13 +148,11 @@ class CompositionRoot {
     final createDonation = CreateDonation(donationsRepo);
     final streamUserDonations = StreamUserDonations(donationsRepo);
 
-    // ✅ Local Storage (movido arriba porque se necesita antes)
     final prefs = await SharedPreferences.getInstance();
     final localStorageDS = LocalStorageDataSource(prefs);
     final LocalStorageRepository localStorageRepo =
         LocalStorageRepositoryImpl(localStorageDS);
 
-    // ✅ Connectivity & Sync Services
     final connectivityService = ConnectivityService();
     await connectivityService.init();
 
@@ -192,7 +190,6 @@ class CompositionRoot {
         ConfirmScheduleDonation(scheduleDonationRepo);
     final confirmPickupDonation = ConfirmPickupDonation(pickupDonationRepo);
 
-    // ✅ Sync Service
     final syncService = SyncService(
       connectivity: connectivityService,
       localStorage: localStorageRepo,

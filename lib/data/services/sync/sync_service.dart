@@ -12,12 +12,6 @@ import 'package:donation_app/data/datasources/donations/schedule_donation_dataso
 import 'package:donation_app/data/datasources/donations/pickup_donation_datasource.dart';
 import 'package:donation_app/data/datasources/donations/booking_datasource.dart';
 
-/// Servicio de sincronización offline-first
-///
-/// Maneja la cola de operaciones pendientes y las sincroniza
-/// cuando hay conexión disponible.
-///
-/// Usa Isolates para operaciones pesadas evitando bloquear la UI.
 class SyncService with BackgroundProcessingMixin {
   final ConnectivityService _connectivity;
   final LocalStorageRepository _localStorage;
@@ -49,32 +43,24 @@ class SyncService with BackgroundProcessingMixin {
         _pickupDS = pickupDS,
         _bookingDS = bookingDS;
 
-  /// Inicializa el servicio y comienza a escuchar cambios de conectividad
   void init() {
     _connectivitySub = _connectivity.onConnectivityChanged.listen((isOnline) {
       if (isOnline) {
-        debugPrint('🔄 Connection restored, starting sync...');
         syncPendingOperations();
       }
     });
 
-    // Intentar sincronizar al iniciar si hay conexión
     if (_connectivity.isOnline) {
       syncPendingOperations();
     }
   }
 
-  /// Sincroniza todas las operaciones pendientes
-  ///
-  /// Usa background processing para operaciones pesadas
   Future<void> syncPendingOperations() async {
     if (_isSyncing) {
-      debugPrint('⏳ Sync already in progress, skipping...');
       return;
     }
 
     if (!_connectivity.isOnline) {
-      debugPrint('📴 No connection, skipping sync');
       return;
     }
 
@@ -83,13 +69,9 @@ class SyncService with BackgroundProcessingMixin {
 
     try {
       final pendingItems = _localStorage.getPendingSyncItems();
-      debugPrint('📤 Found ${pendingItems.length} pending items to sync');
 
-      // Para listas grandes, preparar datos en background
       List<SyncQueueItem> itemsToProcess = pendingItems;
       if (shouldUseIsolate(pendingItems.length)) {
-        debugPrint(
-            '🔄 Processing ${pendingItems.length} items in background...');
         final jsonItems = pendingItems.map((e) => e.toJson()).toList();
         final processedJson = await prepareDataForSync(jsonItems);
         itemsToProcess =
@@ -105,10 +87,8 @@ class SyncService with BackgroundProcessingMixin {
           await _localStorage.removeFromSyncQueue(item.id);
           successCount++;
         } catch (e) {
-          debugPrint('❌ Failed to sync item ${item.id}: $e');
           failCount++;
 
-          // Actualizar intentos
           final updated = item.copyWith(
             attempts: item.attempts + 1,
             lastAttempt: DateTime.now(),
@@ -116,14 +96,11 @@ class SyncService with BackgroundProcessingMixin {
           );
           await _localStorage.updateSyncQueueItem(updated);
 
-          // Si excedió los reintentos, marcar la entidad como fallida
           if (!updated.canRetry) {
             await _markEntityAsFailed(item);
           }
         }
       }
-
-      debugPrint('✅ Sync completed: $successCount success, $failCount failed');
 
       _syncStatusController.add(
         failCount > 0
@@ -131,7 +108,6 @@ class SyncService with BackgroundProcessingMixin {
             : SyncServiceStatus.idle,
       );
     } catch (e) {
-      debugPrint('💥 Sync error: $e');
       _syncStatusController.add(SyncServiceStatus.error);
     } finally {
       _isSyncing = false;
@@ -182,7 +158,6 @@ class SyncService with BackgroundProcessingMixin {
     final docDay = _bookingDS.dayDoc(schedule.uid, schedule.date);
 
     await _firestore.runTransaction((tx) async {
-      // Verificar que no haya conflicto
       final daySnap = await tx.get(docDay);
       if (daySnap.exists) {
         final data = daySnap.data()!;
@@ -207,10 +182,8 @@ class SyncService with BackgroundProcessingMixin {
       );
     });
 
-    // Marcar como sincronizado
     await _localStorage.updateScheduleSyncStatus(
         schedule.id, SyncStatus.synced);
-    debugPrint('✅ Schedule ${schedule.id} synced successfully');
   }
 
   Future<void> _syncPickupDonation(SyncQueueItem item) async {
@@ -249,11 +222,9 @@ class SyncService with BackgroundProcessingMixin {
     });
 
     await _localStorage.updatePickupSyncStatus(pickup.id, SyncStatus.synced);
-    debugPrint('✅ Pickup ${pickup.id} synced successfully');
   }
 
   Future<void> _syncDonation(SyncQueueItem item) async {
-    // Para donaciones individuales (si las creas offline)
     final donations = _localStorage.getDonations();
     final donation = donations.firstWhere(
       (d) => d.id == item.entityId,
@@ -274,10 +245,8 @@ class SyncService with BackgroundProcessingMixin {
 
     await _localStorage.updateDonationSyncStatus(
         donation.id!, SyncStatus.synced);
-    debugPrint('✅ Donation ${donation.id} synced successfully');
   }
 
-  /// Sincroniza el cambio de completionStatus de múltiples donaciones
   Future<void> _syncDonationsCompletionStatus(
     SyncQueueItem item,
     DonationCompletionStatus status,
@@ -285,12 +254,8 @@ class SyncService with BackgroundProcessingMixin {
     final donationIds = List<String>.from(item.payload['donationIds'] as List);
 
     await _donationsDS.updateMultipleCompletionStatus(donationIds, status);
-
-    debugPrint(
-        '✅ Updated ${donationIds.length} donations to ${status.name} in Firebase');
   }
 
-  /// Sincroniza que un schedule fue marcado como entregado
   Future<void> _syncScheduleDelivered(SyncQueueItem item) async {
     final scheduleId = item.entityId;
 
@@ -298,11 +263,8 @@ class SyncService with BackgroundProcessingMixin {
       'isDelivered': true,
       'deliveredAt': FieldValue.serverTimestamp(),
     });
-
-    debugPrint('✅ Schedule $scheduleId marked as delivered in Firebase');
   }
 
-  /// Sincroniza que un pickup fue marcado como entregado
   Future<void> _syncPickupDelivered(SyncQueueItem item) async {
     final pickupId = item.entityId;
 
@@ -310,11 +272,8 @@ class SyncService with BackgroundProcessingMixin {
       'isDelivered': true,
       'deliveredAt': FieldValue.serverTimestamp(),
     });
-
-    debugPrint('✅ Pickup $pickupId marked as delivered in Firebase');
   }
 
-  /// Sincroniza que una donación fue revertida a disponible
   Future<void> _syncDonationAvailable(SyncQueueItem item) async {
     final donationId = item.entityId;
 
@@ -322,8 +281,6 @@ class SyncService with BackgroundProcessingMixin {
       donationId,
       DonationCompletionStatus.available,
     );
-
-    debugPrint('✅ Donation $donationId reverted to available in Firebase');
   }
 
   Future<void> _markEntityAsFailed(SyncQueueItem item) async {
@@ -341,15 +298,12 @@ class SyncService with BackgroundProcessingMixin {
             item.entityId, SyncStatus.failed);
         break;
       default:
-        // Para operaciones de update no hay entidad específica que marcar
         break;
     }
   }
 
-  /// Verifica si hay operaciones pendientes
   bool get hasPendingSync => _localStorage.hasPendingSync();
 
-  /// Cantidad de operaciones pendientes
   int get pendingCount => _localStorage.getPendingSyncItems().length;
 
   void dispose() {

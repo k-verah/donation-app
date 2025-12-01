@@ -26,13 +26,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _navIndex = 2;
   int _screenIndex = 0;
 
-  // Para recordar la foto local de la donación recién creada
   String? _lastLocalImagePathOverride;
 
   @override
   void initState() {
     super.initState();
-    // Inicia el stream de donaciones del usuario desde el Provider
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DonationProvider>().startUserStream();
     });
@@ -75,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return StreamBuilder<List<Donation>>(
       stream: donationProv.donationsStream,
       builder: (context, snapshot) {
-        // Usar datos del stream O del caché local (offline-first)
         final donations = snapshot.data ?? donationProv.donations;
         final last = donations.isEmpty ? null : donations.first;
         final lastLocalPath =
@@ -116,11 +114,11 @@ class _HomeScreenState extends State<HomeScreen> {
           body: _showHub
               ? Column(
                   children: [
-                    const SyncStatusBanner(), // Solo en el Hub
+                    const SyncStatusBanner(),
                     Expanded(child: body),
                   ],
                 )
-              : body, // Las otras pantallas manejan su propio banner
+              : body,
           bottomNavigationBar: NavigationBar(
             selectedIndex: _navIndex,
             onDestinationSelected: _onNavTap,
@@ -176,7 +174,6 @@ class _HubView extends StatelessWidget {
     final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Si NO hay donación: banner expandido sin scroll
     if (lastDonation == null) {
       return SafeArea(
         child: Column(
@@ -195,8 +192,7 @@ class _HubView extends StatelessWidget {
       );
     }
 
-    // Si HAY donación: scroll con banner grande + donación abajo
-    final bannerHeight = screenHeight * 0.35; // 35% de la pantalla
+    final bannerHeight = screenHeight * 0.35;
 
     return SafeArea(
       child: SingleChildScrollView(

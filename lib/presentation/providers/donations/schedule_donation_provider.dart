@@ -9,7 +9,6 @@ class ScheduleDonationProvider extends ChangeNotifier {
   final ConfirmScheduleDonation confirmSchedule;
   ScheduleDonationProvider(this.confirmSchedule);
 
-  /// IDs de donaciones seleccionadas por el usuario
   final Set<String> _selectedDonationIds = {};
 
   Set<String> get selectedDonationIds => Set.unmodifiable(_selectedDonationIds);
@@ -58,21 +57,20 @@ class ScheduleDonationProvider extends ChangeNotifier {
       );
       await confirmSchedule(donation);
       _selectedDonationIds.clear();
-      debugPrint('✅ Schedule creado: ${donation.id}');
+      debugPrint('Schedule creado: ${donation.id}');
       notifyListeners();
-      return null; // éxito (funciona offline, se sincroniza después)
+      return null;
     } on FirebaseException catch (e) {
-      debugPrint('⚠️ Firebase error en schedule: ${e.message}');
+      debugPrint('Firebase error en schedule: ${e.message}');
       return e.message ?? 'Could not schedule.';
     } catch (e) {
-      debugPrint('⚠️ Error en schedule: $e');
-      // Si es error de red, el schedule ya se guardó localmente
+      debugPrint('Error en schedule: $e');
       if (e.toString().contains('network') ||
           e.toString().contains('SocketException') ||
           e.toString().contains('Connection')) {
         _selectedDonationIds.clear();
         notifyListeners();
-        return null; // Guardado localmente, se sincronizará después
+        return null;
       }
       return 'Unexpected error: $e';
     }

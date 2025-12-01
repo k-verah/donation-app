@@ -1,15 +1,10 @@
-/// Estado de sincronización para entidades offline-first
 enum SyncStatus {
-  /// Guardado localmente, pendiente de subir a Firebase
   pending,
 
-  /// Sincronización en progreso
   syncing,
 
-  /// Sincronizado exitosamente con Firebase
   synced,
 
-  /// Falló la sincronización (se reintentará)
   failed,
 }
 

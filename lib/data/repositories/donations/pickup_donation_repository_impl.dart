@@ -40,19 +40,15 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
         message: 'You already have a donation scheduled for this date.',
       );
     }
-    // 1. Guardar localmente primero (respuesta inmediata al usuario)
+
     final pickupWithPending = p.copyWith(syncStatus: SyncStatus.pending);
     await localStorage.savePickupDonation(pickupWithPending);
 
-    // 2. Marcar las donaciones asociadas como "pendientes de completar" (LOCAL)
     await localStorage.updateDonationsCompletionStatus(
       p.donationIds,
       DonationCompletionStatus.pendingCompletion,
     );
-    debugPrint(
-        '📦 Marked ${p.donationIds.length} donations as pending completion (local)');
 
-    // 3. Agregar a la cola de sincronización - pickup
     final pickupSyncItem = SyncQueueItem(
       id: const Uuid().v4(),
       operation: SyncOperation.createPickup,
@@ -62,7 +58,6 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
     );
     await localStorage.addToSyncQueue(pickupSyncItem);
 
-    // 4. Agregar a la cola de sincronización - completionStatus de donaciones
     final donationsSyncItem = SyncQueueItem(
       id: const Uuid().v4(),
       operation: SyncOperation.markDonationsPendingCompletion,
@@ -72,31 +67,19 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
     );
     await localStorage.addToSyncQueue(donationsSyncItem);
 
-    debugPrint('📝 Pickup saved locally, pending sync: ${p.id}');
-
-    // 5. Si hay conexión, sincronizar inmediatamente
     if (connectivity.isOnline) {
       try {
-        // Sincronizar pickup a Firebase
         await _syncToFirebase(p);
         await localStorage.updatePickupSyncStatus(p.id, SyncStatus.synced);
         await localStorage.removeFromSyncQueue(pickupSyncItem.id);
 
-        // Sincronizar completionStatus de donaciones a Firebase
         await donationsDS.updateMultipleCompletionStatus(
           p.donationIds,
           DonationCompletionStatus.pendingCompletion,
         );
         await localStorage.removeFromSyncQueue(donationsSyncItem.id);
-
-        debugPrint('✅ Pickup and donations synced to Firebase: ${p.id}');
-      } catch (e) {
-        // Si falla, se sincronizará después via SyncService
-        debugPrint('⚠️ Immediate sync failed, will retry later: $e');
-      }
-    } else {
-      debugPrint('📴 Offline - pickup will sync when connection restored');
-    }
+      } catch (e) {}
+    } else {}
   }
 
   Future<void> _syncToFirebase(PickupDonation p) async {
