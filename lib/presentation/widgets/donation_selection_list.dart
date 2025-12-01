@@ -586,17 +586,16 @@ class _DonationTile extends StatelessWidget {
             // Tag (si hay)
             if (donation.tags.isNotEmpty)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   donation.tags.first,
-                  style: GoogleFonts.montserrat(
+                  style: TextStyle(
                     fontSize: 10,
-                    color: Colors.blue.shade700,
-                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                 ),
               ),
