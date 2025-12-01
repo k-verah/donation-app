@@ -92,7 +92,10 @@ class _PickupScreenState extends State<PickupDonationScreen> {
 
     if (pickupProvider.selectedDonationIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select at least one donation.")),
+        const SnackBar(
+          content: Text("Please select at least one donation."),
+          backgroundColor: Color(0xFF003137),
+        ),
       );
       return;
     }
@@ -137,7 +140,7 @@ class _PickupScreenState extends State<PickupDonationScreen> {
     if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Pickup scheduled! Will sync when online."),
+          content: Text("Pickup scheduled!"),
           backgroundColor: Color(0xFF003137),
         ),
       );

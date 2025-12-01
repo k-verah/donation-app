@@ -34,6 +34,12 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
 
   @override
   Future<void> confirmPickup(PickupDonation p) async {
+    if (localStorage.hasBookingForDate(p.uid, p.date)) {
+      throw FirebaseException(
+        plugin: 'local',
+        message: 'You already have a donation scheduled for this date.',
+      );
+    }
     // 1. Guardar localmente primero (respuesta inmediata al usuario)
     final pickupWithPending = p.copyWith(syncStatus: SyncStatus.pending);
     await localStorage.savePickupDonation(pickupWithPending);
@@ -109,7 +115,7 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
         if (hasSchedule || hasPickup) {
           throw FirebaseException(
             plugin: 'firestore',
-            message: 'You already have a donation scheduled for today.',
+            message: 'You already have a donation scheduled for this date.',
           );
         }
       }

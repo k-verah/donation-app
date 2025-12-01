@@ -416,6 +416,28 @@ class LocalStorageDataSource {
     }
   }
 
+  /// Verifica si ya existe un schedule o pickup para una fecha específica
+  bool hasBookingForDate(String uid, DateTime date) {
+    final dayKey = _dayKey(date);
+
+    // Verificar schedules
+    final schedules = getSchedulesByUid(uid);
+    final hasSchedule = schedules.any((s) => _dayKey(s.date) == dayKey);
+    if (hasSchedule) return true;
+
+    // Verificar pickups
+    final pickups = getPickupsByUid(uid);
+    final hasPickup = pickups.any((p) => _dayKey(p.date) == dayKey);
+    if (hasPickup) return true;
+
+    return false;
+  }
+
+  /// Genera una key única para un día (formato: yyyy-MM-dd)
+  String _dayKey(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
   // ============================================================
   // SYNC QUEUE - Cola de operaciones pendientes
   // ============================================================

@@ -60,6 +60,8 @@ abstract class LocalStorageRepository {
   List<PickupDonation> getDeliveredPickups(String uid);
   Future<void> markPickupAsDelivered(String id);
 
+  bool hasBookingForDate(String uid, DateTime date);
+
   // Sync Queue
   Future<void> addToSyncQueue(SyncQueueItem item);
   List<SyncQueueItem> getSyncQueue();

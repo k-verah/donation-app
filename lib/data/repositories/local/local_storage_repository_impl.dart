@@ -228,6 +228,11 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
     await dataSource.markPickupAsDelivered(id);
   }
 
+  @override
+  bool hasBookingForDate(String uid, DateTime date) {
+    return dataSource.hasBookingForDate(uid, date);
+  }
+
   // ============================================================
   // Sync Queue
   // ============================================================

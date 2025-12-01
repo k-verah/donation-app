@@ -34,6 +34,12 @@ class ScheduleDonationRepositoryImpl implements ScheduleDonationRepository {
 
   @override
   Future<void> confirmSchedule(ScheduleDonation d) async {
+    if (localStorage.hasBookingForDate(d.uid, d.date)) {
+      throw FirebaseException(
+        plugin: 'local',
+        message: 'You already have a donation scheduled for this date.',
+      );
+    }
     // 1. Guardar localmente primero (respuesta inmediata al usuario)
     final scheduleWithPending = d.copyWith(syncStatus: SyncStatus.pending);
     await localStorage.saveScheduleDonation(scheduleWithPending);
@@ -109,7 +115,7 @@ class ScheduleDonationRepositoryImpl implements ScheduleDonationRepository {
         if (hasSchedule || hasPickup) {
           throw FirebaseException(
             plugin: 'firestore',
-            message: 'You already have a donation scheduled for today.',
+            message: 'You already have a donation scheduled for this date.',
           );
         }
       }

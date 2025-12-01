@@ -72,7 +72,10 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
 
     if (scheduleProvider.selectedDonationIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select at least one donation.")),
+        const SnackBar(
+          content: Text("Please select at least one donation."),
+          backgroundColor: Color(0xFF003137),
+        ),
       );
       return;
     }
@@ -80,7 +83,10 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please pick a donation date.")),
+        const SnackBar(
+          content: Text("Please pick a donation date."),
+          backgroundColor: Color(0xFF003137),
+        ),
       );
       return;
     }
@@ -104,14 +110,17 @@ class _ScheduleScreenState extends State<ScheduleDonationScreen> {
     if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Donation scheduled! Will sync when online."),
+          content: Text("Donation scheduled!"),
           backgroundColor: Color(0xFF003137),
         ),
       );
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error)),
+        SnackBar(
+          content: Text(error),
+          backgroundColor: const Color(0xFF003137),
+        ),
       );
     }
   }

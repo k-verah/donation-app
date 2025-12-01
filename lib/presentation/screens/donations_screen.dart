@@ -157,6 +157,7 @@ class _CompletedDonationsTab extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Donation moved back to Available'),
+                    backgroundColor: Color(0xFF003137),
                   ),
                 );
               }
@@ -189,6 +190,8 @@ class _PendingDeliveriesTab extends StatelessWidget {
             'Schedule a donation or request a pickup to see your reservations here',
         actionLabel: 'Go to Schedule',
         onAction: () => Navigator.pushNamed(context, '/schedule'),
+        secondaryActionLabel: 'Go to Pickup',
+        onSecondaryAction: () => Navigator.pushNamed(context, '/pickup'),
       );
     }
 
@@ -401,7 +404,7 @@ class _SchedulePackageCard extends StatelessWidget {
 
     return _PackageCard(
       icon: Icons.event_available,
-      iconColor: Colors.blue,
+      iconColor: const Color(0xFF003137),
       title: 'Scheduled for ${_formatDate(schedule.date)}',
       subtitle: schedule.time ?? 'No specific time',
       donationCount: schedule.donationIds.length,
@@ -414,9 +417,9 @@ class _SchedulePackageCard extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  '✅ ${schedule.donationIds.length} donations marked as completed!',
+                  '${schedule.donationIds.length} donations marked as completed!',
                 ),
-                backgroundColor: Colors.green,
+                backgroundColor: const Color(0xFF003137),
               ),
             );
           }
@@ -469,7 +472,7 @@ class _PickupPackageCard extends StatelessWidget {
 
     return _PackageCard(
       icon: Icons.local_shipping,
-      iconColor: Colors.orange,
+      iconColor: const Color(0xFF003137),
       title: 'Pickup on ${_formatDate(pickup.date)}',
       subtitle: 'At ${pickup.time}',
       donationCount: pickup.donationIds.length,
@@ -482,9 +485,9 @@ class _PickupPackageCard extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  '✅ ${pickup.donationIds.length} donations marked as completed!',
+                  '${pickup.donationIds.length} donations marked as completed!',
                 ),
-                backgroundColor: Colors.green,
+                backgroundColor: const Color(0xFF003137),
               ),
             );
           }
@@ -792,6 +795,8 @@ class _EmptyStateWidget extends StatelessWidget {
   final String subtitle;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
 
   const _EmptyStateWidget({
     required this.icon,
@@ -799,6 +804,8 @@ class _EmptyStateWidget extends StatelessWidget {
     required this.subtitle,
     this.actionLabel,
     this.onAction,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
   });
 
   @override
@@ -838,8 +845,23 @@ class _EmptyStateWidget extends StatelessWidget {
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.add),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF003137),
+                ),
+                icon: const Icon(Icons.event_available),
                 label: Text(actionLabel!),
+              ),
+            ],
+            if (secondaryActionLabel != null && onSecondaryAction != null) ...[
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: onSecondaryAction,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF003137),
+                  side: const BorderSide(color: Color(0xFF003137)),
+                ),
+                icon: const Icon(Icons.local_shipping),
+                label: Text(secondaryActionLabel!),
               ),
             ],
           ],
