@@ -188,7 +188,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ],
                       const SizedBox(height: 24),
-                      // Donation Insights Card
+
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(

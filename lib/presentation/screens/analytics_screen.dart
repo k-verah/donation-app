@@ -177,8 +177,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                               return const SizedBox.shrink();
                                             }
 
-                                            // Mostramos el ranking (1, 2, 3, ...) para que
-                                            // el eje X sea entendible sin saturar de texto.
+                                            
+
+
                                             return Padding(
                                               padding:
                                                   const EdgeInsets.only(top: 4),
@@ -214,7 +215,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                     borderData: FlBorderData(show: false),
                                     barGroups: analyticsProv.filterStats
                                         .take(5)
-                                        .toList() // ✅ CORRECCIÓN: Agregar .toList() aquí
+                                        .toList() 
                                         .asMap()
                                         .entries
                                         .map((e) {

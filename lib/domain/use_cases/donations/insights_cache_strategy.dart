@@ -1,23 +1,22 @@
 import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 import 'package:donation_app/domain/repositories/local/local_storage_repository.dart';
 
-/// Estrategia completa de caching para Donation Insights
-/// Implementa: Multi-level caching, TTL policies, Cache invalidation, Cache warming
+
 class InsightsCacheStrategy {
   final LocalStorageRepository repository;
 
   InsightsCacheStrategy(this.repository);
 
-  /// Políticas de TTL (Time To Live) para diferentes tipos de datos
+
   static const Duration insightsTTL = Duration(hours: 24);
   static const Duration staleThreshold = Duration(hours: 12);
   static const Duration maxAge = Duration(days: 7);
 
-  /// Nivel 1: Cache en memoria (rápido pero volátil)
+
   List<FoundationInsight>? _memoryCache;
   DateTime? _memoryCacheTimestamp;
 
-  /// Nivel 2: Cache persistente (más lento pero permanente)
+
   Future<List<FoundationInsight>?> getPersistentCache() async {
     final cached = repository.getCachedDonationInsights();
     if (cached != null && repository.isInsightsCacheValid()) {
@@ -26,12 +25,12 @@ class InsightsCacheStrategy {
     return null;
   }
 
-  /// Estrategia de caching multi-nivel: Memory -> Persistent -> Network
+
   Future<CacheResult> getCachedData({
     required String userId,
     bool forceRefresh = false,
   }) async {
-    // Nivel 1: Verificar cache en memoria (más rápido)
+
     if (!forceRefresh && _isMemoryCacheValid()) {
       return CacheResult(
         data: _memoryCache!,
@@ -40,11 +39,11 @@ class InsightsCacheStrategy {
       );
     }
 
-    // Nivel 2: Verificar cache persistente
+
     if (!forceRefresh) {
       final persistentCache = await getPersistentCache();
       if (persistentCache != null && persistentCache.isNotEmpty) {
-        // Actualizar cache en memoria
+
         _updateMemoryCache(persistentCache);
         return CacheResult(
           data: persistentCache,
@@ -54,7 +53,7 @@ class InsightsCacheStrategy {
       }
     }
 
-    // Nivel 3: No hay cache disponible
+
     return CacheResult(
       data: null,
       source: CacheSource.none,
@@ -62,16 +61,16 @@ class InsightsCacheStrategy {
     );
   }
 
-  /// Guarda datos en ambos niveles de cache
+
   Future<void> setCachedData(List<FoundationInsight> insights) async {
-    // Guardar en memoria (Nivel 1)
+
     _updateMemoryCache(insights);
 
-    // Guardar en persistente (Nivel 2)
+
     await repository.cacheDonationInsights(insights);
   }
 
-  /// Cache warming: Pre-carga datos en memoria
+
   Future<void> warmCache() async {
     final persistentCache = await getPersistentCache();
     if (persistentCache != null && persistentCache.isNotEmpty) {
@@ -79,7 +78,7 @@ class InsightsCacheStrategy {
     }
   }
 
-  /// Invalidación de cache basada en tiempo (TTL)
+
   bool _isMemoryCacheValid() {
     if (_memoryCache == null || _memoryCacheTimestamp == null) {
       return false;
@@ -96,7 +95,7 @@ class InsightsCacheStrategy {
 
   bool _isPersistentCacheStale() {
     if (!repository.isInsightsCacheValid()) return true;
-    // La validación ya está implementada en el repositorio
+
     return false;
   }
 
@@ -105,43 +104,43 @@ class InsightsCacheStrategy {
     _memoryCacheTimestamp = DateTime.now();
   }
 
-  /// Invalidación de cache por eventos
+
   Future<void> invalidateOnEvent(CacheInvalidationEvent event) async {
     switch (event) {
       case CacheInvalidationEvent.userDonationCreated:
-        // Invalidar cache cuando se crea una nueva donación
+
         await invalidateCache();
         break;
       case CacheInvalidationEvent.userLoggedOut:
-        // Limpiar cache al cerrar sesión
+
         await clearAllCache();
         break;
       case CacheInvalidationEvent.forceRefresh:
-        // Forzar refresco completo
+
         await invalidateCache();
         break;
       case CacheInvalidationEvent.staleData:
-        // Marcar como stale pero mantener
+
         _memoryCacheTimestamp = DateTime.now().subtract(staleThreshold);
         break;
     }
   }
 
-  /// Invalidar cache (mantener datos pero marcarlos como inválidos)
+
   Future<void> invalidateCache() async {
     _memoryCache = null;
     _memoryCacheTimestamp = null;
     await repository.clearInsightsCache();
   }
 
-  /// Limpiar todo el cache
+
   Future<void> clearAllCache() async {
     _memoryCache = null;
     _memoryCacheTimestamp = null;
     await repository.clearInsightsCache();
   }
 
-  /// Obtener estadísticas del cache
+
   CacheStats getCacheStats() {
     final hasMemoryCache = _memoryCache != null && _isMemoryCacheValid();
     final memoryAge = _memoryCacheTimestamp != null
@@ -157,12 +156,12 @@ class InsightsCacheStrategy {
     );
   }
 
-  /// Estrategia de refresh: Stale-while-revalidate
-  /// Retorna cache aunque esté stale, pero también dispara refresh en background
+
+
   Future<List<FoundationInsight>?> getStaleWhileRevalidate() async {
     final result = await getCachedData(userId: '');
     
-    // Si hay cache (aunque esté stale), retornarlo inmediatamente
+
     if (result.data != null) {
       return result.data;
     }
@@ -171,7 +170,7 @@ class InsightsCacheStrategy {
   }
 }
 
-/// Resultado de una operación de cache
+
 class CacheResult {
   final List<FoundationInsight>? data;
   final CacheSource source;
@@ -186,22 +185,22 @@ class CacheResult {
   bool get hasData => data != null && data!.isNotEmpty;
 }
 
-/// Fuente del cache
+
 enum CacheSource {
-  memory,      // Cache en memoria (más rápido)
-  persistent,  // Cache persistente (SharedPreferences)
-  none,        // No hay cache disponible
+  memory,      
+  persistent,  
+  none,        
 }
 
-/// Eventos que pueden invalidar el cache
+
 enum CacheInvalidationEvent {
-  userDonationCreated,  // Nueva donación creada
-  userLoggedOut,        // Usuario cerró sesión
-  forceRefresh,         // Refresco forzado
-  staleData,           // Datos marcados como stale
+  userDonationCreated,  
+  userLoggedOut,        
+  forceRefresh,         
+  staleData,           
 }
 
-/// Estadísticas del cache
+
 class CacheStats {
   final bool hasMemoryCache;
   final bool hasPersistentCache;

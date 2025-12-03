@@ -59,7 +59,7 @@ class DonationInsightsProvider extends ChangeNotifier {
       final connectivityResult = await _connectivity.checkConnectivity();
       final hasConnection = connectivityResult != ConnectivityResult.none;
 
-      // Estrategia de caching multi-nivel: Memory -> Persistent -> Network
+
       if (!forceRefresh) {
         final cacheResult = await cacheStrategy.getCachedData(
           userId: user.uid,
@@ -71,7 +71,7 @@ class DonationInsightsProvider extends ChangeNotifier {
           _isOffline = !hasConnection || cacheResult.isStale;
           _lastUpdatedAt = DateTime.now();
 
-          // Si el cache está stale y tenemos conexión, continuamos para refrescar
+
           if (!cacheResult.isStale || !hasConnection) {
             notifyListeners();
             if (!hasConnection) {
@@ -96,22 +96,22 @@ class DonationInsightsProvider extends ChangeNotifier {
           _lastUpdatedAt = DateTime.now();
 
           if (freshInsights.isNotEmpty) {
-            // Guardar en cache usando estrategia multi-nivel
+
             await cacheStrategy.setCachedData(freshInsights);
 
-            // También guardar usando el método tradicional para compatibilidad
+
             await cacheInsights(freshInsights);
 
-            // Optimizar almacenamiento después de guardar
+
             await manageStorage.optimizeStorage();
 
-            // Limpiar datos antiguos si es necesario
+
             await manageStorage.cleanupIfNeeded();
           }
 
           _error = null;
         } catch (e) {
-          // Si falla la carga pero tenemos cache, mantenerlo
+
           if (_insights.isEmpty) {
             _error = 'Error loading insights: $e';
             debugPrint(_error);
@@ -121,7 +121,7 @@ class DonationInsightsProvider extends ChangeNotifier {
           }
         }
       } else {
-        // Sin conexión: usar cache si está disponible
+
         if (_insights.isEmpty) {
           _error = 'No internet connection and no cached data available';
         } else {
@@ -142,17 +142,17 @@ class DonationInsightsProvider extends ChangeNotifier {
     await loadInsights(forceRefresh: true);
   }
 
-  // Obtener información del almacenamiento
+
   StorageInfo getStorageInfo() {
     return manageStorage.getStorageInfo();
   }
 
-  // Obtener estadísticas del almacenamiento
+
   StorageStats getStorageStats() {
     return manageStorage.getStorageStats();
   }
 
-  // Limpiar cache manualmente
+
   Future<void> clearCache() async {
     await manageStorage.repository.clearInsightsCache();
     _insights = [];
@@ -160,22 +160,22 @@ class DonationInsightsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Verificar integridad de datos
+
   bool verifyDataIntegrity() {
     return manageStorage.verifyDataIntegrity();
   }
 
-  // Obtener estadísticas del cache
+
   CacheStats getCacheStats() {
     return cacheStrategy.getCacheStats();
   }
 
-  // Cache warming: Pre-cargar datos en memoria
+
   Future<void> warmCache() async {
     await cacheStrategy.warmCache();
   }
 
-  // Invalidar cache por evento
+
   Future<void> invalidateCacheOnEvent(CacheInvalidationEvent event) async {
     await cacheStrategy.invalidateOnEvent(event);
     _insights = [];
@@ -183,7 +183,7 @@ class DonationInsightsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Forzar sincronización manual (simplemente recarga desde red)
+
   Future<void> forceSync() async {
     await loadInsights(forceRefresh: true);
   }
