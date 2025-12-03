@@ -1,4 +1,3 @@
-/*
 import 'package:donation_app/presentation/providers/donations/donation_insights_provider.dart';
 import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 import 'package:donation_app/presentation/providers/sensors/location_provider.dart';
@@ -129,7 +128,7 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
                               'How many donations you made to each foundation and average distance',
                               style: TextStyle(fontSize: 14, color: Colors.grey),
                             ),
-                            //  Banner de estado offline
+
                             if (insightsProv.isOffline)
                               Container(
                                 padding: const EdgeInsets.all(12),
@@ -161,7 +160,7 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
                                 ),
                               ),
                             const SizedBox(height: 24),
-                            // Gráfico de barras
+
                             SizedBox(
                               height: 300,
                               child: Card(
@@ -282,8 +281,9 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
                                 ),
                               ),
                             ),
+
                             const SizedBox(height: 32),
-                            // Lista detallada
+
                             const Text(
                               'Detailed Statistics',
                               style: TextStyle(
@@ -297,7 +297,7 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
                                   elevation: 2,
                                   child: InkWell(
                                     onTap: () {
-                                      // Aplicar filtros en LocationProvider
+
                                       final locationProvider = context.read<LocationProvider>();
                                       locationProvider.setFilters(
                                         causeVal: insight.foundation.cause,
@@ -305,7 +305,8 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
                                         scheduleVal: insight.foundation.schedule,
                                       );
                                       
-                                      // Navegar directamente al mapa
+                                      locationProvider.setRecommendedFoundation(insight.foundation);
+                                      
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (_) => const MapScreen(),
@@ -374,7 +375,7 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
                                             ],
                                           ),
                                           const SizedBox(height: 4),
-                                          // Schedule
+
                                           Row(
                                             children: [
                                               Icon(
@@ -449,4 +450,4 @@ class _DonationInsightsScreenState extends State<DonationInsightsScreen> {
     );
   }
 }
-*/
+

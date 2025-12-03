@@ -7,6 +7,7 @@ import 'package:donation_app/domain/entities/donations/schedule_donation.dart';
 import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
 import 'package:donation_app/domain/entities/sync/sync_status.dart';
 import 'package:donation_app/domain/entities/sync/sync_queue_item.dart';
+import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 import 'dart:convert';
 
 class LocalStorageDataSource {
@@ -27,6 +28,8 @@ class LocalStorageDataSource {
   static const String _keyPickupDonations = 'pickup_donations';
   static const String _keySyncQueue = 'sync_queue';
   static const String _keyDonationsCacheTimestamp = 'donations_cache_timestamp';
+  static const String _keyCachedInsights = 'cached_donation_insights';
+  static const String _keyInsightsCacheTimestamp = 'insights_cache_timestamp';
 
   Future<void> saveFilterPreferences({
     required String cause,
@@ -443,7 +446,82 @@ class LocalStorageDataSource {
       _prefs.remove(_keyPickupDonations),
       _prefs.remove(_keySyncQueue),
       _prefs.remove(_keyDonationsCacheTimestamp),
+      _prefs.remove(_keyCachedInsights),
+      _prefs.remove(_keyInsightsCacheTimestamp),
       clearCache(),
+    ]);
+  }
+
+  Future<void> cacheDonationInsights(List<FoundationInsight> insights) async {
+    final jsonList = insights.map((insight) {
+      final foundation = insight.foundation;
+      return {
+        'foundation': {
+          'id': foundation.id,
+          'title': foundation.title,
+          'cause': foundation.cause,
+          'access': foundation.access,
+          'schedule': foundation.schedule,
+          'lat': foundation.pos.lat,
+          'lng': foundation.pos.lng,
+        },
+        'donationCount': insight.donationCount,
+        'averageDistance': insight.averageDistance,
+      };
+    }).toList();
+
+    await Future.wait([
+      _prefs.setString(_keyCachedInsights, jsonEncode(jsonList)),
+      _prefs.setInt(_keyInsightsCacheTimestamp, DateTime.now().millisecondsSinceEpoch),
+    ]);
+  }
+
+  List<FoundationInsight>? getCachedDonationInsights() {
+    final jsonString = _prefs.getString(_keyCachedInsights);
+    if (jsonString == null) return null;
+
+    try {
+      final jsonList = jsonDecode(jsonString) as List<dynamic>;
+      return jsonList.map((json) {
+        final map = json as Map<String, dynamic>;
+        final foundationMap = map['foundation'] as Map<String, dynamic>;
+        final foundation = FoundationPoint(
+          id: foundationMap['id'] as String,
+          title: foundationMap['title'] as String,
+          cause: foundationMap['cause'] as String,
+          access: foundationMap['access'] as String,
+          schedule: foundationMap['schedule'] as String,
+          pos: GeoPoint(
+            foundationMap['lat'] as double,
+            foundationMap['lng'] as double,
+          ),
+        );
+        return FoundationInsight(
+          foundation: foundation,
+          donationCount: map['donationCount'] as int,
+          averageDistance: map['averageDistance'] as double,
+        );
+      }).toList();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  bool isInsightsCacheValid() {
+    final timestamp = _prefs.getInt(_keyInsightsCacheTimestamp);
+    if (timestamp == null) return false;
+
+    final cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    final now = DateTime.now();
+    final difference = now.difference(cacheTime);
+
+    return difference.inHours < 24;
+  }
+
+  Future<void> clearInsightsCache() async {
+    await Future.wait([
+      _prefs.remove(_keyCachedInsights),
+      _prefs.remove(_keyInsightsCacheTimestamp),
     ]);
   }
 }

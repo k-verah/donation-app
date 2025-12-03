@@ -99,6 +99,11 @@ import 'domain/use_cases/sensors/location/load_cached_points.dart';
 import 'domain/use_cases/donations/create_donation.dart';
 import 'domain/use_cases/donations/confirm_schedule_donation.dart';
 import 'domain/use_cases/donations/confirm_pickup_donation.dart';
+import 'domain/use_cases/donations/get_donation_insights_by_foundation.dart';
+import 'domain/use_cases/donations/cache_donation_insights.dart';
+import 'domain/use_cases/donations/load_cached_insights.dart';
+import 'domain/use_cases/donations/manage_insights_storage.dart';
+import 'domain/use_cases/donations/insights_cache_strategy.dart';
 
 //------------------------- PRESENTATION -------------------------
 
@@ -113,6 +118,7 @@ import 'presentation/providers/sensors/camera_provider.dart';
 import 'presentation/providers/donations/donation_provider.dart';
 import 'presentation/providers/donations/schedule_donation_provider.dart';
 import 'presentation/providers/donations/pickup_donation_provider.dart';
+import 'presentation/providers/donations/donation_insights_provider.dart';
 // Analytics
 import 'presentation/providers/analytics/analytics_provider.dart';
 // Sync
@@ -208,7 +214,7 @@ class CompositionRoot {
     final stopCamera = StopCamera(camRepo);
     final pickFromGallery = PickFromGallery(camRepo);
 
-    // Analytics
+
     final analyticsDS = AnalyticsDataSource(FirebaseFirestore.instance);
     final AnalyticsRepository analyticsRepo =
         AnalyticsRepositoryImpl(analyticsDS);
@@ -217,13 +223,23 @@ class CompositionRoot {
     final getFilterCombinationStats = GetFilterCombinationStats(analyticsRepo);
     final getPointUsageStats = GetPointUsageStats(analyticsRepo);
 
-    // Local Storage Use Cases
+
     final saveFilterPreferences = SaveFilterPreferences(localStorageRepo);
     final loadFilterPreferences = LoadFilterPreferences(localStorageRepo);
     final saveLastLocation = SaveLastLocation(localStorageRepo);
     final loadLastLocation = LoadLastLocation(localStorageRepo);
     final cacheDonationPoints = CacheDonationPoints(localStorageRepo);
     final loadCachedPoints = LoadCachedPoints(localStorageRepo);
+
+
+    final getDonationInsights = GetDonationInsightsByFoundation(
+      donationsRepo: donationsRepo,
+      foundationsRepo: foundationsRepo,
+    );
+    final cacheDonationInsights = CacheDonationInsights(localStorageRepo);
+    final loadCachedInsights = LoadCachedInsights(localStorageRepo);
+    final manageInsightsStorage = ManageInsightsStorage(localStorageRepo);
+    final insightsCacheStrategy = InsightsCacheStrategy(localStorageRepo);
 
     return [
       ChangeNotifierProvider(
@@ -289,6 +305,27 @@ class CompositionRoot {
           connectivity: connectivityService,
           syncService: syncService,
         ),
+      ),
+      ChangeNotifierProxyProvider2<AuthProvider, LocationProvider, DonationInsightsProvider>(
+        create: (_) => DonationInsightsProvider(
+          getInsights: getDonationInsights,
+          cacheInsights: cacheDonationInsights,
+          loadCachedInsights: loadCachedInsights,
+          manageStorage: manageInsightsStorage,
+          cacheStrategy: insightsCacheStrategy,
+          authProvider: _.read<AuthProvider>(),
+          locationProvider: _.read<LocationProvider>(),
+        ),
+        update: (_, authProvider, locationProvider, previous) =>
+            previous ?? DonationInsightsProvider(
+              getInsights: getDonationInsights,
+              cacheInsights: cacheDonationInsights,
+              loadCachedInsights: loadCachedInsights,
+              manageStorage: manageInsightsStorage,
+              cacheStrategy: insightsCacheStrategy,
+              authProvider: authProvider,
+              locationProvider: locationProvider,
+            ),
       ),
     ];
   }

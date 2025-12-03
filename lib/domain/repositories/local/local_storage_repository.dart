@@ -6,6 +6,7 @@ import 'package:donation_app/domain/entities/donations/schedule_donation.dart';
 import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
 import 'package:donation_app/domain/entities/sync/sync_status.dart';
 import 'package:donation_app/domain/entities/sync/sync_queue_item.dart';
+import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 
 abstract class LocalStorageRepository {
   Future<void> saveFilterPreferences({
@@ -66,4 +67,9 @@ abstract class LocalStorageRepository {
   bool hasPendingSync();
 
   Future<void> clearAllLocalData();
+
+  Future<void> cacheDonationInsights(List<FoundationInsight> insights);
+  List<FoundationInsight>? getCachedDonationInsights();
+  bool isInsightsCacheValid();
+  Future<void> clearInsightsCache();
 }

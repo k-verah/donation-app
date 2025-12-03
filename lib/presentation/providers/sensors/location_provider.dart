@@ -43,9 +43,11 @@ class LocationProvider extends ChangeNotifier {
   List<FoundationPoint> _points = [];
   String cause = 'All', access = 'All', schedule = 'All';
   String? recommendationMsg;
+  FoundationPoint? _forcedRecommended;
 
   GeoPoint? get current => _current;
   List<FoundationPoint> get points => _points;
+  FoundationPoint? get forcedRecommended => _forcedRecommended;
 
   bool _isOffline = false;
   bool get isOffline => _isOffline;
@@ -128,6 +130,9 @@ class LocationProvider extends ChangeNotifier {
     if (accessVal != null) access = accessVal;
     if (scheduleVal != null) schedule = scheduleVal;
 
+
+    _forcedRecommended = null;
+
     saveFilterPreferences(
       cause: cause,
       access: access,
@@ -138,6 +143,11 @@ class LocationProvider extends ChangeNotifier {
   }
 
   FoundationPoint? recommend() {
+
+    if (_forcedRecommended != null) {
+      return _forcedRecommended;
+    }
+    
     final res = recommendUC(
       points: _points,
       cause: cause,
@@ -148,5 +158,15 @@ class LocationProvider extends ChangeNotifier {
     recommendationMsg = res.message;
     notifyListeners();
     return res.best;
+  }
+
+  void setRecommendedFoundation(FoundationPoint? foundation) {
+    _forcedRecommended = foundation;
+    notifyListeners();
+  }
+
+  void clearRecommendedFoundation() {
+    _forcedRecommended = null;
+    notifyListeners();
   }
 }

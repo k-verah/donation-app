@@ -1,4 +1,3 @@
-/*
 import 'package:donation_app/domain/entities/donations/donation.dart';
 import 'package:donation_app/domain/entities/foundations/foundation_point.dart';
 import 'package:donation_app/domain/entities/sensors/geo_point.dart';
@@ -10,7 +9,7 @@ import 'dart:math' show cos, asin, sqrt;
 class FoundationInsight {
   final FoundationPoint foundation;
   final int donationCount;
-  final double averageDistance; // en metros
+  final double averageDistance; 
 
   FoundationInsight({
     required this.foundation,
@@ -32,14 +31,14 @@ class GetDonationInsightsByFoundation {
     required String userId,
     required GeoPoint? userLocation,
   }) async {
-    // 1. Obtener todas las donaciones del usuario
+
     final donationsStream = donationsRepo.streamByUid(userId);
     final donations = await donationsStream.first;
 
-    // 2. Obtener todas las fundaciones
+
     final foundations = await foundationsRepo.fetchAll();
 
-    // 3. ✅ MULTITHREADING: Mover cálculos pesados a un isolate
+
     final insights = await compute(
       _calculateInsights,
       {
@@ -52,34 +51,25 @@ class GetDonationInsightsByFoundation {
     return insights;
   }
 
-  // ✅ Función top-level para usar con compute (debe ser serializable)
+
   static List<FoundationInsight> _calculateInsights(Map<String, dynamic> data) {
     final donations = data['donations'] as List<Donation>;
     final foundations = data['foundations'] as List<FoundationPoint>;
     final userLocation = data['userLocation'] as GeoPoint?;
 
-    // Crear un mapa de fundaciones por ID para acceso rápido
+
     final foundationsMap = {
       for (final f in foundations) f.id: f,
     };
 
-    // Agrupar donaciones por foundationId (si existe) o por tipo (fallback)
+
     final Map<String, List<Donation>> donationsByFoundation = {};
     
     for (final donation in donations) {
-      String? foundationKey;
-      
-      // Prioridad 1: Si tiene foundationId explícito, usarlo
-      if (donation.foundationId != null && donation.foundationId!.isNotEmpty) {
-        foundationKey = donation.foundationId;
-      } 
-      // Prioridad 2: Fallback - mapear por tipo de donación a fundación específica
-      else {
-        foundationKey = _mapDonationTypeToFoundationIdStatic(
-          donation.type,
-          foundations,
-        );
-      }
+      final foundationKey = _mapDonationTypeToFoundationIdStatic(
+        donation.type,
+        foundations,
+      );
       
       if (foundationKey != null) {
         donationsByFoundation.putIfAbsent(
@@ -89,14 +79,14 @@ class GetDonationInsightsByFoundation {
       }
     }
 
-    // Calcular insights por fundación
+
     final List<FoundationInsight> insights = [];
 
     for (final foundation in foundations) {
-      // Contar donaciones que tienen este foundationId
+
       final matchingDonations = donationsByFoundation[foundation.id] ?? [];
 
-      // Calcular distancia promedio (si tenemos ubicación del usuario)
+
       double avgDistance = 0.0;
       if (userLocation != null && matchingDonations.isNotEmpty) {
         final distance = _calculateDistanceStatic(
@@ -106,7 +96,7 @@ class GetDonationInsightsByFoundation {
         avgDistance = distance;
       }
 
-      // Solo agregar si hay donaciones
+
       if (matchingDonations.isNotEmpty) {
         insights.add(FoundationInsight(
           foundation: foundation,
@@ -116,13 +106,13 @@ class GetDonationInsightsByFoundation {
       }
     }
 
-    // Ordenar por número de donaciones (descendente)
+
     insights.sort((a, b) => b.donationCount.compareTo(a.donationCount));
 
     return insights;
   }
 
-  // ✅ Versión estática para usar en isolate
+
   static String? _mapDonationTypeToFoundationIdStatic(
     String donationType,
     List<FoundationPoint> foundations,
@@ -169,4 +159,4 @@ class GetDonationInsightsByFoundation {
   static double _degStatic(double d) => d * 3.141592653589793 / 180.0;
   static double _hStatic(double x) => (1 - cos(x)) / 2;
 }
-*/
+

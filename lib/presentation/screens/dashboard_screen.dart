@@ -1,6 +1,7 @@
 import 'package:donation_app/domain/entities/donations/donation.dart';
 import 'package:donation_app/presentation/providers/donations/donation_provider.dart';
 import 'package:donation_app/presentation/widgets/sync_status_indicator.dart';
+import 'package:donation_app/presentation/screens/donation_insights_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -170,7 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      // Placeholder estático, puedes reemplazarlo con tu propio feed
+
                       ...const [
                         _ActionTile(
                           title:
@@ -186,6 +187,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           date: "1 week ago",
                         ),
                       ],
+                      const SizedBox(height: 24),
+                      // Donation Insights Card
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const DonationInsightsScreen(),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.bar_chart,
+                                  size: 32,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Donation Insights',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'View detailed statistics by foundation',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                  color: Colors.grey[400],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 );

@@ -66,16 +66,22 @@ class _MapScreenState extends State<MapScreen> {
         vm.hasActiveFilters() ? vm.getFilteredAndSorted() : vm.sorted();
 
     FoundationPoint? recommendedPoint;
-    if (vm.hasActiveFilters()) {
-      final recommendation = vm.recommendUC(
-        points: vm.points,
-        cause: vm.cause,
-        access: vm.access,
-        schedule: vm.schedule,
-        origin: vm.current,
-      );
-      recommendedPoint = recommendation.best;
-      vm.recommendationMsg = recommendation.message;
+    if (vm.hasActiveFilters() || vm.forcedRecommended != null) {
+
+      if (vm.forcedRecommended != null) {
+        recommendedPoint = vm.forcedRecommended;
+        vm.recommendationMsg = null;
+      } else {
+        final recommendation = vm.recommendUC(
+          points: vm.points,
+          cause: vm.cause,
+          access: vm.access,
+          schedule: vm.schedule,
+          origin: vm.current,
+        );
+        recommendedPoint = recommendation.best;
+        vm.recommendationMsg = recommendation.message;
+      }
 
       if (recommendedPoint != null &&
           recommendedPoint.id != _lastRecommendedPoint?.id) {
@@ -102,7 +108,7 @@ class _MapScreenState extends State<MapScreen> {
         infoWindow: InfoWindow(
           title: "${p.title}${d.isNaN ? '' : ' (${d.toStringAsFixed(0)} m)'}",
         ),
-        // Todos rojos por defecto, excepto el recomendado que será verde
+
         icon: isRecommended
             ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)
             : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),

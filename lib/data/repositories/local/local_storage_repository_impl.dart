@@ -8,6 +8,7 @@ import 'package:donation_app/domain/entities/donations/pickup_donation.dart';
 import 'package:donation_app/domain/entities/sync/sync_status.dart';
 import 'package:donation_app/domain/entities/sync/sync_queue_item.dart';
 import 'package:donation_app/domain/repositories/local/local_storage_repository.dart';
+import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 
 class LocalStorageRepositoryImpl implements LocalStorageRepository {
   final LocalStorageDataSource dataSource;
@@ -251,5 +252,25 @@ class LocalStorageRepositoryImpl implements LocalStorageRepository {
   @override
   Future<void> clearAllLocalData() async {
     await dataSource.clearAllLocalData();
+  }
+
+  @override
+  Future<void> cacheDonationInsights(List<FoundationInsight> insights) async {
+    await dataSource.cacheDonationInsights(insights);
+  }
+
+  @override
+  List<FoundationInsight>? getCachedDonationInsights() {
+    return dataSource.getCachedDonationInsights();
+  }
+
+  @override
+  bool isInsightsCacheValid() {
+    return dataSource.isInsightsCacheValid();
+  }
+
+  @override
+  Future<void> clearInsightsCache() async {
+    await dataSource.clearInsightsCache();
   }
 }

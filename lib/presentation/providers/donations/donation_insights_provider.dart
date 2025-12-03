@@ -1,7 +1,8 @@
-/*
 import 'package:donation_app/domain/use_cases/donations/get_donation_insights_by_foundation.dart';
 import 'package:donation_app/domain/use_cases/donations/cache_donation_insights.dart';
 import 'package:donation_app/domain/use_cases/donations/load_cached_insights.dart';
+import 'package:donation_app/domain/use_cases/donations/manage_insights_storage.dart';
+import 'package:donation_app/domain/use_cases/donations/insights_cache_strategy.dart';
 import 'package:donation_app/presentation/providers/auth/auth_provider.dart';
 import 'package:donation_app/presentation/providers/sensors/location_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -11,6 +12,8 @@ class DonationInsightsProvider extends ChangeNotifier {
   final GetDonationInsightsByFoundation getInsights;
   final CacheDonationInsights cacheInsights;
   final LoadCachedInsights loadCachedInsights;
+  final ManageInsightsStorage manageStorage;
+  final InsightsCacheStrategy cacheStrategy;
   final AuthProvider authProvider;
   final LocationProvider locationProvider;
   final Connectivity _connectivity = Connectivity();
@@ -19,6 +22,8 @@ class DonationInsightsProvider extends ChangeNotifier {
     required this.getInsights,
     required this.cacheInsights,
     required this.loadCachedInsights,
+    required this.manageStorage,
+    required this.cacheStrategy,
     required this.authProvider,
     required this.locationProvider,
   });
@@ -35,7 +40,7 @@ class DonationInsightsProvider extends ChangeNotifier {
   bool get isOffline => _isOffline;
   DateTime? get lastUpdatedAt => _lastUpdatedAt;
 
-  // Cargar desde cache primero, luego refrescar desde red
+
   Future<void> loadInsights({bool forceRefresh = false}) async {
     _loading = true;
     _error = null;
@@ -50,22 +55,33 @@ class DonationInsightsProvider extends ChangeNotifier {
         return;
       }
 
-      // 1. Verificar conectividad
+
       final connectivityResult = await _connectivity.checkConnectivity();
       final hasConnection = connectivityResult != ConnectivityResult.none;
 
-      // 2. Cargar desde cache primero (si no es force refresh)
+      // Estrategia de caching multi-nivel: Memory -> Persistent -> Network
       if (!forceRefresh) {
-        final cachedInsights = loadCachedInsights();
-        if (cachedInsights != null && cachedInsights.isNotEmpty) {
-          _insights = cachedInsights;
-          _isOffline = !hasConnection;
-          _lastUpdatedAt = DateTime.now(); // Podrías guardar el timestamp del cache
-          notifyListeners(); // Mostrar cache inmediatamente
+        final cacheResult = await cacheStrategy.getCachedData(
+          userId: user.uid,
+          forceRefresh: false,
+        );
+
+        if (cacheResult.hasData) {
+          _insights = cacheResult.data!;
+          _isOffline = !hasConnection || cacheResult.isStale;
+          _lastUpdatedAt = DateTime.now();
+
+          // Si el cache está stale y tenemos conexión, continuamos para refrescar
+          if (!cacheResult.isStale || !hasConnection) {
+            notifyListeners();
+            if (!hasConnection) {
+              _loading = false;
+              return;
+            }
+          }
         }
       }
 
-      // 3. Si hay conexión, cargar datos frescos
       if (hasConnection) {
         try {
           final userLocation = locationProvider.current;
@@ -79,9 +95,18 @@ class DonationInsightsProvider extends ChangeNotifier {
           _isOffline = false;
           _lastUpdatedAt = DateTime.now();
 
-          // Guardar en cache
           if (freshInsights.isNotEmpty) {
+            // Guardar en cache usando estrategia multi-nivel
+            await cacheStrategy.setCachedData(freshInsights);
+
+            // También guardar usando el método tradicional para compatibilidad
             await cacheInsights(freshInsights);
+
+            // Optimizar almacenamiento después de guardar
+            await manageStorage.optimizeStorage();
+
+            // Limpiar datos antiguos si es necesario
+            await manageStorage.cleanupIfNeeded();
           }
 
           _error = null;
@@ -112,9 +137,55 @@ class DonationInsightsProvider extends ChangeNotifier {
     }
   }
 
-  // Método para refrescar forzadamente
+
   Future<void> refresh() async {
     await loadInsights(forceRefresh: true);
   }
+
+  // Obtener información del almacenamiento
+  StorageInfo getStorageInfo() {
+    return manageStorage.getStorageInfo();
+  }
+
+  // Obtener estadísticas del almacenamiento
+  StorageStats getStorageStats() {
+    return manageStorage.getStorageStats();
+  }
+
+  // Limpiar cache manualmente
+  Future<void> clearCache() async {
+    await manageStorage.repository.clearInsightsCache();
+    _insights = [];
+    _lastUpdatedAt = null;
+    notifyListeners();
+  }
+
+  // Verificar integridad de datos
+  bool verifyDataIntegrity() {
+    return manageStorage.verifyDataIntegrity();
+  }
+
+  // Obtener estadísticas del cache
+  CacheStats getCacheStats() {
+    return cacheStrategy.getCacheStats();
+  }
+
+  // Cache warming: Pre-cargar datos en memoria
+  Future<void> warmCache() async {
+    await cacheStrategy.warmCache();
+  }
+
+  // Invalidar cache por evento
+  Future<void> invalidateCacheOnEvent(CacheInvalidationEvent event) async {
+    await cacheStrategy.invalidateOnEvent(event);
+    _insights = [];
+    _lastUpdatedAt = null;
+    notifyListeners();
+  }
+
+  // Forzar sincronización manual (simplemente recarga desde red)
+  Future<void> forceSync() async {
+    await loadInsights(forceRefresh: true);
+  }
 }
-*/
+
