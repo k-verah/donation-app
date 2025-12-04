@@ -86,6 +86,9 @@ class ScheduleDonationRepositoryImpl implements ScheduleDonationRepository {
     final docDonation = donationDS.newDoc(d.id);
     final docDay = bookingDS.dayDoc(d.uid, d.date);
     final docAnalytics = analyticsDS.globalDoc();
+    final docScheduleHours = analyticsDS.scheduleHoursDoc();
+
+    final scheduleHour = analyticsDS.parseHourFromTimeString(d.time);
 
     await db.runTransaction((tx) async {
       final daySnap = await tx.get(docDay);
@@ -118,6 +121,14 @@ class ScheduleDonationRepositoryImpl implements ScheduleDonationRepository {
       );
 
       tx.set(docAnalytics, analyticsDS.incSchedule(), SetOptions(merge: true));
+
+      if (scheduleHour != null) {
+        tx.set(
+          docScheduleHours,
+          analyticsDS.incScheduleHour(scheduleHour),
+          SetOptions(merge: true),
+        );
+      }
     });
   }
 

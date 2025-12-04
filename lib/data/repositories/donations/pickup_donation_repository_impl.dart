@@ -86,6 +86,9 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
     final docPickup = pickupDS.newDoc(p.id);
     final docDay = bookingDS.dayDoc(p.uid, p.date);
     final docAnalytics = analyticsDS.globalDoc();
+    final docPickupHours = analyticsDS.pickupHoursDoc();
+
+    final pickupHour = analyticsDS.parseHourFromTimeString(p.time);
 
     await db.runTransaction((tx) async {
       final daySnap = await tx.get(docDay);
@@ -118,6 +121,14 @@ class PickupDonationRepositoryImpl implements PickupDonationRepository {
       );
 
       tx.set(docAnalytics, analyticsDS.incPickup(), SetOptions(merge: true));
+
+      if (pickupHour != null) {
+        tx.set(
+          docPickupHours,
+          analyticsDS.incPickupHour(pickupHour),
+          SetOptions(merge: true),
+        );
+      }
     });
   }
 
